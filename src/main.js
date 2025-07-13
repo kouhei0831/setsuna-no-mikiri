@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.18', {
+        this.add.text(20, 20, 'v1.0.19', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -135,7 +135,7 @@ class GameScene extends Phaser.Scene {
             enemyState: 'normal',
             isGameActive: false,
             isWaiting: false, // シグナル待機中フラグ
-            maxStages: 5
+            maxStages: 4
         };
     }
 
@@ -171,7 +171,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.18', {
+        this.versionText = this.add.text(20, 20, 'v1.0.19', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -245,12 +245,12 @@ class GameScene extends Phaser.Scene {
     }
 
     updateStageAssets() {
-        // IT資産の種類をステージに応じて変更（1-5のサイクルで統一）
-        const itAssets = ['pcNormal', 'pcNormal', 'cloudNormal', 'aiNormal', 'aiNormal'];
-        const threats = ['malwareNormal', 'malwareNormal', 'systemErrorNormal', 'systemErrorNormal', 'malwareNormal'];
+        // IT資産の種類をステージに応じて変更（1-4のサイクルで統一）
+        const itAssets = ['pcNormal', 'pcNormal', 'cloudNormal', 'cloudNormal'];
+        const threats = ['malwareNormal', 'malwareNormal', 'systemErrorNormal', 'systemErrorNormal'];
         
-        // 全ステージで1-5のサイクルを使用
-        const cycleIndex = (this.gameState.stage - 1) % 5;
+        // 全ステージで1-4のサイクルを使用
+        const cycleIndex = (this.gameState.stage - 1) % 4;
         const currentItAsset = itAssets[cycleIndex] || 'pcNormal';
         const currentThreat = threats[cycleIndex] || 'malwareNormal';
 
@@ -288,25 +288,25 @@ class GameScene extends Phaser.Scene {
     }
 
     showStageInfo() {
-        const baseStageNames = ['PC(ピーシー)', 'サーバー', 'クラウド', 'AI(エーアイ)', 'ネットワーク'];
+        const baseStageNames = ['PC(ピーシー)', 'サーバー', 'ネットワーク', 'クラウド'];
         
-        // ステージ名は1-5のサイクルで統一
-        const cycleStage = ((this.gameState.stage - 1) % 5) + 1; // 1-5のサイクル
+        // ステージ名は1-4のサイクルで統一
+        const cycleStage = ((this.gameState.stage - 1) % 4) + 1; // 1-4のサイクル
         const stageName = baseStageNames[cycleStage - 1] || 'IT';
         
         // 難易度表示
         let difficultyLabel = '';
         let difficultyColor = '#F59E0B'; // デフォルト色
         
-        if (this.gameState.stage <= 5) {
-            // ステージ1-5: 通常（表示なし）
+        if (this.gameState.stage <= 4) {
+            // ステージ1-4: 通常（表示なし）
             difficultyLabel = '';
-        } else if (this.gameState.stage <= 10) {
-            // ステージ6-10: ハード
+        } else if (this.gameState.stage <= 8) {
+            // ステージ5-8: ハード
             difficultyLabel = 'ハードモード';
             difficultyColor = '#FF6B35';
         } else {
-            // ステージ11以降: エクストリーム
+            // ステージ9以降: エクストリーム
             difficultyLabel = 'エクストリームモード';
             difficultyColor = '#FF0000';
         }
@@ -439,24 +439,24 @@ class GameScene extends Phaser.Scene {
         // ステージに応じた制限時間（指定されたフレーム数ベース）
         let targetFrames;
         
-        if (this.gameState.stage <= 5) {
-            // ステージ1-5: 通常難易度
-            const normalFrames = [120, 90, 60, 40, 30];
+        if (this.gameState.stage <= 4) {
+            // ステージ1-4: 通常難易度
+            const normalFrames = [120, 90, 60, 40];
             targetFrames = normalFrames[this.gameState.stage - 1];
-        } else if (this.gameState.stage <= 10) {
-            // ステージ6-10: ハード難易度
-            const hardFrames = [20, 18, 16, 14, 12];
-            const hardIndex = (this.gameState.stage - 6) % 5;
+        } else if (this.gameState.stage <= 8) {
+            // ステージ5-8: ハード難易度
+            const hardFrames = [20, 18, 16, 14];
+            const hardIndex = (this.gameState.stage - 5) % 4;
             targetFrames = hardFrames[hardIndex];
         } else {
-            // ステージ11-15: エクストリーム難易度
-            const extremeFrames = [14, 13, 12, 11, 10];
-            const extremeIndex = Math.min((this.gameState.stage - 11) % 5, 4);
+            // ステージ9-12: エクストリーム難易度
+            const extremeFrames = [14, 13, 12, 11];
+            const extremeIndex = Math.min((this.gameState.stage - 9) % 4, 3);
             targetFrames = extremeFrames[extremeIndex];
             
-            // ステージ16以降はエクストリーム最終値（10フレーム）で固定
-            if (this.gameState.stage > 15) {
-                targetFrames = 10;
+            // ステージ13以降はエクストリーム最終値（11フレーム）で固定
+            if (this.gameState.stage > 12) {
+                targetFrames = 11;
             }
         }
         
@@ -678,9 +678,9 @@ class GameScene extends Phaser.Scene {
             this.frameCounterText.setVisible(false);
         }
         
-        // 5ステージごとにエンディング画面に遷移
-        if (this.gameState.stage > this.gameState.maxStages && (this.gameState.stage - 1) % 5 === 0) {
-            // 5の倍数ステージクリア時のエンディング
+        // 4ステージごとにエンディング画面に遷移
+        if (this.gameState.stage > this.gameState.maxStages && (this.gameState.stage - 1) % 4 === 0) {
+            // 4の倍数ステージクリア時のエンディング
             this.scene.start('EndingScene', { score: this.gameState.score });
         } else {
             this.signalText.setVisible(false);
@@ -759,7 +759,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.18', {
+        this.add.text(20, 20, 'v1.0.19', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
