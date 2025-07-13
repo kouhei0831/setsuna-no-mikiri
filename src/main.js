@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.1', {
+        this.add.text(20, 20, 'v1.0.2', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -78,7 +78,7 @@ class MenuScene extends Phaser.Scene {
         this.add.image(400, 300, 'menuBackground');
 
         // タイトル
-        this.add.text(400, 150, '刹那の見切り', {
+        this.add.text(400, 150, '刹那の見切り【テスト版】', {
             fontSize: '48px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -159,7 +159,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.1', {
+        this.versionText = this.add.text(20, 20, 'v1.0.2', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -360,9 +360,8 @@ class GameScene extends Phaser.Scene {
             this.defenseTimer.remove();
         }
         
-        // フレームカウンター停止・保存
+        // フレームカウンター停止・保存（表示は継続）
         const reactionFrames = this.frameCounter;
-        this.frameCounterText.setVisible(false);
         
         this.onDefenseSuccess(reactionFrames);
     }
@@ -407,9 +406,6 @@ class GameScene extends Phaser.Scene {
     onDefenseFail() {
         this.gameState.isGameActive = false;
         this.signalButton.setTexture('signalError');
-        
-        // フレームカウンター停止
-        this.frameCounterText.setVisible(false);
         
         if (this.gameState.itAssetState === 'normal') {
             // 1回目の失敗
@@ -476,6 +472,11 @@ class GameScene extends Phaser.Scene {
     nextStage() {
         this.gameState.stage++;
         
+        // フレームカウンター非表示
+        if (this.frameCounterText) {
+            this.frameCounterText.setVisible(false);
+        }
+        
         if (this.gameState.stage > this.gameState.maxStages) {
             // 全ステージクリア
             this.scene.start('EndingScene', { score: this.gameState.score });
@@ -488,6 +489,11 @@ class GameScene extends Phaser.Scene {
     }
 
     showGameOverOptions() {
+        // フレームカウンター非表示
+        if (this.frameCounterText) {
+            this.frameCounterText.setVisible(false);
+        }
+        
         // ゲームオーバー時の選択肢
         const buttonY = 450;
         
@@ -548,7 +554,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.1', {
+        this.add.text(20, 20, 'v1.0.2', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
