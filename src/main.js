@@ -68,17 +68,19 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.20', {
-            fontSize: '14px',
-            fill: '#888888',
-            fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 4, y: 2 }
-        }).setOrigin(0, 0);
-
         // 背景
         this.add.image(640, 360, 'menuBackground').setScale(1.6);
+
+        // バージョン表示（背景の後に配置して最前面に）
+        this.add.text(20, 20, 'v1.1.0', {
+            fontSize: '18px',
+            fill: '#FFFFFF',
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 8, y: 4 },
+            stroke: '#6B46C1',
+            strokeThickness: 2
+        }).setOrigin(0, 0).setDepth(1000);
 
         // タイトル
         this.add.text(640, 200, '刹那の見切り【テスト版】', {
@@ -179,15 +181,6 @@ class GameScene extends Phaser.Scene {
     }
 
     setupUI() {
-        // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.20', {
-            fontSize: '14px',
-            fill: '#888888',
-            fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 4, y: 2 }
-        }).setOrigin(0, 0);
-
         // ステージ表示
         this.stageText = this.add.text(640, 50, '', {
             fontSize: '28px',
@@ -775,15 +768,6 @@ class EndingScene extends Phaser.Scene {
     }
 
     create() {
-        // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.20', {
-            fontSize: '14px',
-            fill: '#888888',
-            fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 4, y: 2 }
-        }).setOrigin(0, 0);
-
         // 背景
         this.add.rectangle(640, 360, 1280, 720, 0x6B46C1);
 
