@@ -60,6 +60,36 @@ class StaticAssetGenerator {
     }
 
     /**
+     * テキストなしボタンSVG生成
+     */
+    static generateTextlessButtonSVG(width = 200, height = 60) {
+        const svg = `
+<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+  <!-- ボタン -->
+  <defs>
+    <linearGradient id="buttonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6B46C1"/>
+    </linearGradient>
+    <filter id="buttonShadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- ボタン背景 -->
+  <rect x="5" y="5" width="${width-10}" height="${height-10}" rx="25" fill="url(#buttonGradient)" filter="url(#buttonShadow)"/>
+  
+  <!-- ボタンのハイライト -->
+  <rect x="5" y="5" width="${width-10}" height="${(height-10)/2}" rx="25" fill="#FFFFFF" opacity="0.2"/>
+  
+  <!-- ボタンの境界線 -->
+  <rect x="5" y="5" width="${width-10}" height="${height-10}" rx="25" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+</svg>`;
+        
+        return svg.trim();
+    }
+
+    /**
      * プレイヤーキャラクタースプライトのSVG生成
      */
     static generatePlayerCharacterSVG(width = 64, height = 64) {
@@ -265,6 +295,10 @@ class StaticAssetGenerator {
             const svg = this.generateSignalButtonSVG(120, state);
             fs.writeFileSync(path.join(assetsDir, `signal_button_${state}.svg`), svg);
         });
+
+        // テキストなしボタン
+        const textlessButtonSvg = this.generateTextlessButtonSVG(200, 60);
+        fs.writeFileSync(path.join(assetsDir, 'textless_button.svg'), textlessButtonSvg);
 
         // プレイヤーキャラクター
         const playerSvg = this.generatePlayerCharacterSVG(64, 64);

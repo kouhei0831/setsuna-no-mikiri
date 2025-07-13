@@ -1,47 +1,16 @@
-<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <!-- DXC IT守護者 - 通常状態 -->
-  <defs>
-    <radialGradient id="bodyGradient" cx="0.3" cy="0.3">
-      <stop offset="0%" stop-color="#8B5CF6"/>
-      <stop offset="100%" stop-color="#6B46C1"/>
-    </radialGradient>
-    <filter id="shadow">
-      <feDropShadow dx="1" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/>
-    </filter>
-  </defs>
-  
-  <!-- シールド（背景） -->
-  <path d="M32,8 L42,15 L42,30 L32,40 L22,30 L22,15 Z" 
-        fill="#FFFFFF" stroke="#6B46C1" stroke-width="2" opacity="0.7" filter="url(#shadow)"/>
-  
-  <!-- メインボディ -->
-  <circle cx="32" cy="32" r="20" fill="url(#bodyGradient)" filter="url(#shadow)"/>
-  
-  <!-- 顔の輪郭 -->
-  <circle cx="32" cy="30" r="12" fill="#FFFFFF" opacity="0.9"/>
-  
-  <!-- 目 -->
-  <circle cx="28" cy="27" r="3" fill="#000000"/>
-  <circle cx="36" cy="27" r="3" fill="#000000"/>
-  
-  <!-- 瞳のハイライト -->
-  <circle cx="29" cy="26" r="1" fill="#FFFFFF"/>
-  <circle cx="37" cy="26" r="1" fill="#FFFFFF"/>
-  
-  <!-- 口（信頼できる守護者の表情） -->
-  <path d="M 28 32 Q 32 35 36 32" 
-        stroke="#000000" stroke-width="2" fill="none" stroke-linecap="round"/>
-  
-  <!-- 守護者のマーク（胸部） -->
-  <circle cx="32" cy="42" r="6" fill="#FFFFFF" opacity="0.8"/>
-  <path d="M32,38 L35,41 L35,47 L32,50 L29,47 L29,41 Z" 
-        fill="#6B46C1"/>
-  
-  <!-- 腕（シールドを持っているポーズ） -->
-  <ellipse cx="20" cy="38" rx="3" ry="8" fill="url(#bodyGradient)" transform="rotate(-20 20 38)"/>
-  <ellipse cx="44" cy="38" rx="3" ry="8" fill="url(#bodyGradient)" transform="rotate(20 44 38)"/>
-  
-  <!-- 小さなシールド（手に持っている） -->
-  <ellipse cx="18" cy="35" rx="4" ry="6" fill="#FFFFFF" stroke="#6B46C1" stroke-width="1" 
-           transform="rotate(-20 18 35)" opacity="0.9"/>
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+    <!-- メインボディ -->
+    <circle cx="32" cy="32" r="21.333333333333332" fill="#8B5CF6"/>
+    
+    <!-- 目 -->
+    <circle cx="24" cy="28" r="4" fill="#FFFFFF"/>
+    <circle cx="40" cy="28" r="4" fill="#FFFFFF"/>
+    
+    <!-- 瞳 -->
+    <circle cx="24" cy="28" r="2" fill="#000000"/>
+    <circle cx="40" cy="28" r="2" fill="#000000"/>
+    
+    <!-- 口 -->
+    <path d="M 26 38 Q 32 44 38 38" 
+          stroke="#000000" stroke-width="2" fill="none"/>
 </svg>
