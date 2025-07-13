@@ -35,10 +35,11 @@ class PreloadScene extends Phaser.Scene {
         this.load.svg('signalSuccess', 'assets/images/signal_success.svg', { width: 120, height: 120 });
         this.load.svg('signalError', 'assets/images/signal_error.svg', { width: 120, height: 120 });
         
-        this.load.svg('playerNormal', 'assets/images/player_character.svg', { width: 64, height: 64 });
-        this.load.svg('playerDamaged', 'assets/images/player_character_damaged.svg', { width: 64, height: 64 });
-        this.load.svg('playerVictory', 'assets/images/player_character_victory.svg', { width: 64, height: 64 });
-        this.load.svg('playerKo', 'assets/images/player_character_ko.svg', { width: 64, height: 64 });
+        // プレイヤーキャラクター（全て同じ画像を使用）
+        this.load.image('heroNormal', 'assets/gen/images/player_character_normal.png');
+        this.load.image('heroDamaged', 'assets/gen/images/player_character_normal.png');
+        this.load.image('heroVictory', 'assets/gen/images/player_character_normal.png');
+        this.load.image('heroKo', 'assets/gen/images/player_character_normal.png');
         
         this.load.svg('pcNormal', 'assets/images/protected_pc_normal.svg', { width: 64, height: 64 });
         this.load.svg('cloudNormal', 'assets/images/protected_cloud_normal.svg', { width: 64, height: 64 });
@@ -72,7 +73,7 @@ class MenuScene extends Phaser.Scene {
         this.add.image(640, 360, 'menuBackground').setScale(1.6);
 
         // バージョン表示（背景の後に配置して最前面に）
-        this.add.text(20, 20, 'v1.1.0', {
+        this.add.text(20, 20, 'v1.1.1', {
             fontSize: '18px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -248,7 +249,7 @@ class GameScene extends Phaser.Scene {
 
     setupCharacters() {
         // プレイヤーキャラクター
-        this.player = this.add.image(250, 360, 'playerNormal').setOrigin(0.5);
+        this.player = this.add.image(300, 500, 'heroNormal').setOrigin(0.5).setScale(0.3);
 
         // IT資産と敵をステージに応じて設定
         this.updateStageAssets();
@@ -542,7 +543,7 @@ class GameScene extends Phaser.Scene {
 
     onDefenseSuccess(reactionFrames) {
         // クリック時の画面揺らしエフェクト
-        this.cameras.main.shake(200, 0.01);
+        this.cameras.main.shake(400, 0.02);
         
         // 成功時の処理
         this.signalText.setText('✓')
@@ -595,6 +596,9 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseFail() {
+        // 失敗時の画面揺らしエフェクト
+        this.cameras.main.shake(400, 0.02);
+        
         this.gameState.isGameActive = false;
         
         // フレームカウンター非表示
@@ -666,15 +670,15 @@ class GameScene extends Phaser.Scene {
     }
 
     updateCharacterSprites() {
-        // プレイヤー状態に応じてスプライト更新
+        // プレイヤー状態に応じてスプライト更新（全て同じ画像を使用）
         if (this.gameState.playerState === 'damaged') {
-            this.player.setTexture('playerDamaged');
+            this.player.setTexture('heroDamaged');
         } else if (this.gameState.playerState === 'victory') {
-            this.player.setTexture('playerVictory');
+            this.player.setTexture('heroVictory');
         } else if (this.gameState.playerState === 'ko') {
-            this.player.setTexture('playerKo');
+            this.player.setTexture('heroKo');
         } else {
-            this.player.setTexture('playerNormal');
+            this.player.setTexture('heroNormal');
         }
     }
 
