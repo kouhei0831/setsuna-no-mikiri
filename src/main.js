@@ -139,6 +139,15 @@ class GameScene extends Phaser.Scene {
         this.startStage();
     }
 
+    update() {
+        // フレームカウンター更新
+        if (this.gameState.isGameActive && this.frameCounterText && this.frameCounterText.visible) {
+            this.frameCounter++;
+            const displayFrame = this.frameCounter.toString().padStart(4, '0');
+            this.frameCounterText.setText(`FRAME: ${displayFrame}`);
+        }
+    }
+
     setupUI() {
         // ステージ表示
         this.stageText = this.add.text(400, 50, '', {
@@ -311,7 +320,7 @@ class GameScene extends Phaser.Scene {
         // フレームカウンター初期化・表示開始
         this.frameCounter = 0;
         this.frameCounterText.setVisible(true);
-        this.updateFrameCounter();
+        this.frameCounterText.setText('FRAME: 0000');
         
         this.gameState.isGameActive = true;
         
@@ -323,21 +332,6 @@ class GameScene extends Phaser.Scene {
                 this.onDefenseFail();
             }
         });
-    }
-
-    updateFrameCounter() {
-        if (this.gameState.isGameActive) {
-            this.frameCounter++;
-            
-            // デジタル時計風フォーマット（4桁ゼロ埋め）
-            const displayFrame = this.frameCounter.toString().padStart(4, '0');
-            this.frameCounterText.setText(`FRAME: ${displayFrame}`);
-            
-            // 次フレームで再実行
-            this.time.delayedCall(16.67, () => { // 60FPS想定
-                this.updateFrameCounter();
-            });
-        }
     }
 
     onDefenseInput() {
