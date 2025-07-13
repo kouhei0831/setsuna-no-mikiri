@@ -1,29 +1,21 @@
 # 刹那の見切り（IT防衛戦） - 必要アセット一覧
 
+## ゲーム仕様変更履歴
+
+### v1.0.9の変更点（一時的実装）
+- **シグナル表示**: ボタン画像からテキストベースのシンボル表示に変更（**暫定措置**）
+  - 危険時: 大きな赤い ⚠ マーク（点滅あり）
+  - 成功時: 緑の ✓ チェックマーク  
+  - 失敗時: 赤い ✕ バツマーク
+  - 早期クリック: 赤い ✕ マーク
+- **背景円**: 色付きの円でマークを強調
+- **視覚効果**: 点滅エフェクトで注意を引く仕様
+
+**重要**: 危険時の表示シンボルは本ゲームの**最重要要素**です。現在のテキストシンボルは開発効率化のための一時的な実装であり、将来的には専用デザインのアセット画像に置き換える予定です。
+
 ## 1. 必須画像アセット
 
 ### 1.1 ゲームプレイ用画像
-
-#### シグナルボタン（最重要）
-- **signal_button_normal.png** (120x120px)
-  - 用途: 待機状態のシグナル表示
-  - 色: DXC紫 (#6B46C1) ベース
-  - 形状: 丸いボタン、白い境界線
-
-- **signal_button_active.png** (120x120px)
-  - 用途: 「今だ！守って！」の状態
-  - 色: 黄色 (#F59E0B) ベース、光っている感じ
-  - 形状: 丸いボタン、アクティブ感のあるエフェクト
-
-- **signal_button_success.png** (120x120px)
-  - 用途: 防御成功時のフィードバック
-  - 色: 緑色 (#10B981) ベース
-  - 形状: 丸いボタン、シールドエフェクト付き
-
-- **signal_button_error.png** (120x120px)
-  - 用途: 防御失敗時のフィードバック
-  - 色: 赤色 (#EF4444) ベース
-  - 形状: 丸いボタン、警告感を表現
 
 #### プレイヤーキャラクター
 - **player_character_normal.png** (64x64px)
@@ -45,11 +37,6 @@
   - 用途: プレイヤーキャラクター - 勝利状態
   - デザイン: 喜んでいる、シールドを高く掲げている
   - 表情: 誇らしげで嬉しそう
-
-- **player_character_cutin.png** (128x128px)
-  - 用途: プレイヤーキャラクター - カットイン演出
-  - デザイン: 大きく迫力のある守護者ポーズ、決意に満ちた表情
-  - サイズ: 通常の2倍サイズで迫力を演出
 
 #### 守るべきIT資産（防御目標）
 - **protected_pc_normal.png** (64x64px)
@@ -291,6 +278,26 @@
 
 ### 1.2 UI（ユーザーインターフェース）用画像
 
+#### シグナル表示（最重要要素）
+- **signal_danger.png** (120x120px)
+  - 用途: 危険シグナル表示 - **ゲーム最重要アセット**
+  - デザイン: 警告を表す強いビジュアル、瞬時に認識可能
+  - 色: 警告の赤/黄色系、DXCアクセントと調和
+  - エフェクト: 点滅に適した高コントラスト設計
+  - 特記: プレイヤーの反射的反応を誘発する最適化されたデザイン
+
+- **signal_success.png** (120x120px)
+  - 用途: 成功時シグナル表示
+  - デザイン: 成功・安全を表すポジティブなビジュアル
+  - 色: 成功の緑色系、安心感を与える配色
+  - 特記: 危険シグナルと明確に区別できるデザイン
+
+- **signal_failure.png** (120x120px)
+  - 用途: 失敗時・早期クリック時シグナル表示
+  - デザイン: 失敗・エラーを表すネガティブなビジュアル
+  - 色: エラーの赤色系、反省を促す配色
+  - 特記: 失敗の種類（遅延/早期）を直感的に理解できるデザイン
+
 #### ボタン類
 - **start_button.png** (200x60px)
   - 用途: メインメニューの「スタート」ボタン
@@ -343,12 +350,13 @@
 ## 3. 優先度別整理
 
 ### 最高優先度（ゲームが動くのに必須）
-1. signal_button_normal.png
-2. signal_button_active.png
-3. signal_button_success.png
-4. signal_button_error.png
-5. success_sound.mp3
-6. fail_sound.mp3
+1. **signal_danger.svg** - 危険シグナル表示（**最重要アセット**）
+2. **signal_active.svg** - アクティブ状態シグナル
+3. **signal_success.svg** - 成功表示シグナル
+4. **signal_error.svg** - 失敗・エラー表示シグナル
+5. 音声ファイル（現在未実装）
+
+**注意**: v1.0.9では一時的にテキストシンボル（⚠、✓、✕）を使用していますが、コードでは上記のSVGファイルを参照しています。シグナル表示は本ゲームの**コア機能**です。
 
 ### 高優先度（見栄えに重要）
 1. player_character_normal.png
@@ -392,55 +400,56 @@
 ```
 assets/
 ├── images/
+│   ├── signals/
+│   │   ├── signal_danger.svg（最重要・危険シグナル）
+│   │   ├── signal_active.svg（アクティブ状態）
+│   │   ├── signal_success.svg（成功表示）
+│   │   └── signal_error.svg（失敗・エラー表示）
 │   ├── buttons/
-│   │   ├── signal_button_normal.png
-│   │   ├── signal_button_active.png
-│   │   ├── signal_button_success.png
-│   │   ├── signal_button_error.png
-│   │   ├── start_button.png
-│   │   └── retry_button.png
+│   │   ├── start_button.svg
+│   │   └── retry_button.svg
 │   ├── characters/
-│   │   └── player_character.png
+│   │   ├── player_character.svg
+│   │   ├── player_character_damaged.svg
+│   │   ├── player_character_victory.svg
+│   │   └── player_character_ko.svg
 │   ├── protected_assets/
-│   │   ├── protected_pc.png
-│   │   ├── protected_iot.png
-│   │   ├── protected_laptop.png
-│   │   ├── protected_cloud.png
-│   │   └── protected_ai.png
+│   │   ├── protected_pc_normal.svg
+│   │   ├── protected_cloud_normal.svg
+│   │   └── protected_ai_normal.svg
 │   ├── threats/
-│   │   ├── threat_malware.png
-│   │   ├── threat_system_error.png
-│   │   ├── threat_cyber_attack.png
-│   │   ├── threat_disaster.png
-│   │   └── threat_ai_poison.png
-│   ├── effects/
-│   │   ├── shield_effect.png
-│   │   └── star_particle.png
+│   │   ├── threat_malware_normal.svg
+│   │   └── threat_system_error_normal.svg
 │   ├── backgrounds/
-│   │   ├── background_menu.png
-│   │   └── background_game.png
-│   └── logos/
-│       └── dxc_logo.png
+│   │   └── background_menu.svg
+│   └── unused_assets/
+│       ├── character_large.svg
+│       ├── character_medium.svg
+│       ├── character_small.svg
+│       ├── enemy_cloud.svg
+│       ├── enemy_laptop.svg
+│       ├── enemy_pc.svg
+│       ├── enemy_server.svg
+│       ├── star_particle_large.svg
+│       ├── star_particle_medium.svg
+│       └── star_particle_small.svg
 └── sounds/
-    ├── effects/
-    │   ├── success_sound.mp3
-    │   ├── fail_sound.mp3
-    │   └── button_click.mp3
-    └── music/
-        ├── menu_bgm.mp3
-        └── game_bgm.mp3
+    └── (現在は空フォルダ)
 ```
+
+**注意**: 現在の実装は**SVG形式**を使用しており、v1.0.9では`signal_*.svg`ファイルがコードで参照されていますが、実際にはテキストシンボル（⚠、✓、✕）でレンダリングされています。
 
 ## 5. 画像仕様
 
 ### ファイル形式
-- **PNG**: 透明背景が必要なもの（ボタン、キャラクター、エフェクト）
+- **SVG**: 現在使用中（スケーラブル、ベクター形式）
+- **PNG**: 将来的な代替案（透明背景が必要なもの）
 - **JPG**: 背景画像（ファイルサイズ削減）
 
 ### 解像度
-- **基本**: 2倍サイズで作成（高解像度対応）
-- **最小サイズ**: 仕様書記載の1倍サイズ
-- **最大サイズ**: 基本の2倍まで
+- **SVG**: スケーラブルなので解像度の概念なし
+- **PNG変換時**: 基本サイズで作成
+- **最小サイズ**: 仕様書記載のサイズ
 
 ### カラーパレット
 - **DXC紫**: #6B46C1 (メイン)
@@ -477,7 +486,9 @@ assets/
 ## 8. 制作スケジュール（参考）
 
 ### Week 1
-- 最高優先度アセット（シグナルボタン4種 + 効果音2種）
+- **最高優先度アセット**: シグナル表示4種（danger/active/success/error）※現在のコードで参照
+- **重要**: `signal_danger.svg`はゲーム最重要アセットとして最優先で制作
+- **注意**: v1.0.9では実際にはテキストシンボル（⚠、✓、✕）で表示
 
 ### Week 2  
 - 高優先度アセット（プレイヤーキャラ + 最初の守るべきIT資産 + 最初の脅威 + UIボタン + 背景）
@@ -564,6 +575,41 @@ Create a pixel art UI button:
 - CRT scanline effect
 - Transparent PNG background
 ```
+
+---
+
+## 10. v1.0.9 現在の技術仕様
+
+### ゲームエンジン
+- **Phaser.js 3.70.0** - HTML5ゲームフレームワーク
+- **WebGL/Canvas2D** - レンダリングエンジン
+- **Node.js サーバー** - 外部デバイスアクセス対応
+
+### シンボルベースUI (v1.0.9の主要変更点)
+- **危険シグナル**: ⚠ マーク（120px、黄色背景円、点滅効果）
+- **成功表示**: ✓ マーク（120px、緑色背景円）
+- **失敗表示**: ✕ マーク（120px、赤色背景円）
+- **実装技術**: `Phaser.Text` + `Phaser.Graphics` API
+- **メリット**: シグナルボタン画像ファイル不要、軽量化、レスポンシブ対応
+
+### パフォーマンス仕様
+- **Frame Rate**: 60fps 固定（reaction time測定用）
+- **Frame Counter**: デジタル時計風表示、ステージ間で保持
+- **Early Click Penalty**: "まだだよ！おちついて！" メッセージ
+- **対応解像度**: 800x600 基準（スケーラブル対応）
+
+### ネットワーク仕様
+- **外部アクセス**: 同一Wi-Fi内デバイス対応
+- **サーバーポート**: 8001 (Node.js HTTP server)
+- **CORS対応**: クロスオリジンアクセス許可
+
+### バージョン履歴
+- **v1.0.10**: シグナル表示クリア問題修正、ファイル名変更（signal_button_* → signal_*）
+- **v1.0.9**: シンボルベースUI実装、背景円エフェクト追加
+- **v1.0.8**: お手付きメッセージ改善
+- **v1.0.7**: 早クリック禁止システム実装
+- **v1.0.6**: フレームカウンター表示継続改善
+- **v1.0.5**: フレームカウンター実装
 
 ---
 

@@ -30,10 +30,10 @@ class PreloadScene extends Phaser.Scene {
         });
 
         // SVGアセットをロード
-        this.load.svg('signalNormal', 'assets/images/signal_button_normal.svg', { width: 120, height: 120 });
-        this.load.svg('signalActive', 'assets/images/signal_button_active.svg', { width: 120, height: 120 });
-        this.load.svg('signalSuccess', 'assets/images/signal_button_success.svg', { width: 120, height: 120 });
-        this.load.svg('signalError', 'assets/images/signal_button_error.svg', { width: 120, height: 120 });
+        this.load.svg('signalNormal', 'assets/images/signal_danger.svg', { width: 120, height: 120 });
+        this.load.svg('signalActive', 'assets/images/signal_active.svg', { width: 120, height: 120 });
+        this.load.svg('signalSuccess', 'assets/images/signal_success.svg', { width: 120, height: 120 });
+        this.load.svg('signalError', 'assets/images/signal_error.svg', { width: 120, height: 120 });
         
         this.load.svg('playerNormal', 'assets/images/player_character.svg', { width: 64, height: 64 });
         this.load.svg('playerDamaged', 'assets/images/player_character_damaged.svg', { width: 64, height: 64 });
@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.9', {
+        this.add.text(20, 20, 'v1.0.10', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.9', {
+        this.versionText = this.add.text(20, 20, 'v1.0.10', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -199,15 +199,16 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // シグナル表示（画面上部）
-        this.signalText = this.add.text(400, 100, '', {
-            fontSize: '48px',
+        this.signalGraphics = this.add.graphics().setVisible(false);
+        
+        // 危険マーク用のテキスト（シンプルな警告マーク）
+        this.signalText = this.add.text(400, 120, '⚠', {
+            fontSize: '120px',
             fill: '#FF0000',
             fontFamily: 'Arial',
             fontWeight: 'bold',
             stroke: '#FFFFFF',
-            strokeThickness: 3,
-            backgroundColor: '#000000',
-            padding: { x: 20, y: 10 }
+            strokeThickness: 6
         }).setOrigin(0.5).setVisible(false);
 
         // フレーム数表示（デジタル時計風）
@@ -305,6 +306,14 @@ class GameScene extends Phaser.Scene {
     }
 
     startDefenseRound() {
+        // 前回のシグナル表示をクリア
+        this.signalText.setVisible(false);
+        this.signalGraphics.setVisible(false);
+        this.signalGraphics.clear();
+        
+        // すべてのTweenを停止
+        this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
+        
         // 緊張感を演出するための段階的な警告
         this.showBuildupSequence();
     }
@@ -359,16 +368,22 @@ class GameScene extends Phaser.Scene {
         // 待機状態終了
         this.gameState.isWaiting = false;
         
-        // 警告シグナル表示（画面上部に大きく表示）
-        this.signalText.setText('⚠️ 危険！クリックして防御！ ⚠️')
+        // 危険マーク表示
+        this.signalText.setText('⚠')
             .setFill('#FF0000')
             .setVisible(true);
         
+        // 背景に赤い円を追加
+        this.signalGraphics.clear();
+        this.signalGraphics.fillStyle(0xFF0000, 0.3);
+        this.signalGraphics.fillCircle(400, 120, 80);
+        this.signalGraphics.setVisible(true);
+        
         // シグナルの点滅エフェクト
         this.tweens.add({
-            targets: this.signalText,
+            targets: [this.signalText, this.signalGraphics],
             alpha: { from: 1, to: 0.3 },
-            duration: 200,
+            duration: 300,
             yoyo: true,
             repeat: -1
         });
@@ -429,29 +444,43 @@ class GameScene extends Phaser.Scene {
         });
         
         // シグナルをエラー表示に変更
-        this.signalText.setText('❌ まだだよ！落ち着いて！ ❌')
+        this.signalText.setText('✕')
             .setFill('#FF4444')
             .setVisible(true);
         
+        // 背景を赤に変更
+        this.signalGraphics.clear();
+        this.signalGraphics.fillStyle(0xFF4444, 0.4);
+        this.signalGraphics.fillCircle(400, 120, 80);
+        this.signalGraphics.setVisible(true);
+        
         // 点滅停止
-        this.tweens.killTweensOf(this.signalText);
+        this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
         this.signalText.setAlpha(1);
+        this.signalGraphics.setAlpha(1);
         
         this.showMessage('まだだよ！おちついて！', 1500, () => {
             // シグナルを非表示にしてからミス処理
             this.signalText.setVisible(false);
+            this.signalGraphics.setVisible(false);
             this.onDefenseFail();
         });
     }
 
     onDefenseSuccess(reactionFrames) {
         // 成功時の処理
-        this.signalText.setText('✅ 成功！守った！ ✅')
+        this.signalText.setText('✓')
             .setFill('#00FF00');
         
+        // 背景を緑に変更
+        this.signalGraphics.clear();
+        this.signalGraphics.fillStyle(0x00FF00, 0.3);
+        this.signalGraphics.fillCircle(400, 120, 80);
+        
         // 点滅停止
-        this.tweens.killTweensOf(this.signalText);
+        this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
         this.signalText.setAlpha(1);
+        this.signalGraphics.setAlpha(1);
         
         // シールドエフェクト
         this.showShieldEffect();
@@ -490,12 +519,18 @@ class GameScene extends Phaser.Scene {
         this.gameState.isGameActive = false;
         
         // 失敗時のシグナル表示
-        this.signalText.setText('💥 失敗！やられた！ 💥')
+        this.signalText.setText('✕')
             .setFill('#FF0000');
         
+        // 背景を赤に変更
+        this.signalGraphics.clear();
+        this.signalGraphics.fillStyle(0xFF0000, 0.4);
+        this.signalGraphics.fillCircle(400, 120, 80);
+        
         // 点滅停止
-        this.tweens.killTweensOf(this.signalText);
+        this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
         this.signalText.setAlpha(1);
+        this.signalGraphics.setAlpha(1);
         
         if (this.gameState.itAssetState === 'normal') {
             // 1回目の失敗
@@ -572,7 +607,8 @@ class GameScene extends Phaser.Scene {
             this.scene.start('EndingScene', { score: this.gameState.score });
         } else {
             this.signalText.setVisible(false);
-            this.tweens.killTweensOf(this.signalText);
+            this.signalGraphics.setVisible(false);
+            this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
             this.messageText.setText('');
             this.updateStageAssets(); // 新しいステージのアセットを設定
             this.startStage();
@@ -646,7 +682,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.9', {
+        this.add.text(20, 20, 'v1.0.10', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
