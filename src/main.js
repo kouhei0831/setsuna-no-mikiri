@@ -11,7 +11,7 @@ class PreloadScene extends Phaser.Scene {
 
     preload() {
         // 読み込み画面
-        this.add.text(400, 280, 'ロード中...', {
+        this.add.text(512, 280, 'ロード中...', {
             fontSize: '32px',
             fill: '#FFFFFF',
             fontFamily: 'Arial'
@@ -21,12 +21,12 @@ class PreloadScene extends Phaser.Scene {
         const progressBar = this.add.graphics();
         const progressBox = this.add.graphics();
         progressBox.fillStyle(0x222222);
-        progressBox.fillRect(300, 320, 200, 20);
+        progressBox.fillRect(412, 320, 200, 20);
 
         this.load.on('progress', (value) => {
             progressBar.clear();
             progressBar.fillStyle(0x6B46C1);
-            progressBar.fillRect(300, 320, 200 * value, 20);
+            progressBar.fillRect(412, 320, 200 * value, 20);
         });
 
         // SVGアセットをロード
@@ -49,7 +49,10 @@ class PreloadScene extends Phaser.Scene {
         
         this.load.svg('startButton', 'assets/images/start_button.svg', { width: 200, height: 60 });
         this.load.svg('retryButton', 'assets/images/retry_button.svg', { width: 200, height: 60 });
-        this.load.svg('menuBackground', 'assets/images/background_menu.svg', { width: 800, height: 600 });
+        this.load.svg('menuBackground', 'assets/images/background_menu.svg', { width: 1024, height: 600 });
+        
+        // ゲーム背景画像
+        this.load.image('gameBackground', 'assets/gen/images/game_background_cyber.png');
     }
 
     create() {
@@ -66,7 +69,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.19', {
+        this.add.text(20, 20, 'v1.0.20', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -75,26 +78,28 @@ class MenuScene extends Phaser.Scene {
         }).setOrigin(0, 0);
 
         // 背景
-        this.add.image(400, 300, 'menuBackground');
+        this.add.image(640, 360, 'menuBackground').setDisplaySize(1280, 720);
 
         // タイトル
-        this.add.text(400, 150, '刹那の見切り【テスト版】', {
-            fontSize: '48px',
+        this.add.text(640, 200, '刹那の見切り【テスト版】', {
+            fontSize: '56px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
             fontWeight: 'bold',
             stroke: '#6B46C1',
+            strokeThickness: 6
+        }).setOrigin(0.5);
+
+        this.add.text(640, 270, 'DXCのIT(アイティー)をまもろう！', {
+            fontSize: '28px',
+            fill: '#FFFFFF',
+            fontFamily: 'Arial',
+            stroke: '#1a1a2e',
             strokeThickness: 4
         }).setOrigin(0.5);
 
-        this.add.text(400, 200, 'DXCのIT(アイティー)をまもろう！', {
-            fontSize: '24px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial'
-        }).setOrigin(0.5);
-
         // スタートボタン
-        const startButton = this.add.image(400, 350, 'startButton')
+        const startButton = this.add.image(640, 420, 'startButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -108,17 +113,21 @@ class MenuScene extends Phaser.Scene {
             });
 
         // DXCブランディング
-        this.add.text(400, 500, 'DXC Technology Family Day 2025', {
+        this.add.text(640, 600, 'DXC Technology Family Day 2025', {
             fontSize: '16px',
             fill: '#FFFFFF',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#2d1b69',
+            padding: { x: 10, y: 5 }
         }).setOrigin(0.5);
 
         // 操作説明
-        this.add.text(400, 430, 'タップして IT をまもろう！', {
+        this.add.text(640, 520, 'タップして IT をまもろう！', {
             fontSize: '18px',
             fill: '#F59E0B',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
     }
 }
@@ -151,8 +160,8 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // 背景（ゲーム用の薄い色）
-        this.add.rectangle(400, 300, 800, 600, 0x16213e);
+        // ゲーム背景画像
+        this.add.image(640, 360, 'gameBackground').setDisplaySize(1280, 720);
 
         this.setupUI();
         this.setupCharacters();
@@ -171,7 +180,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.19', {
+        this.versionText = this.add.text(20, 20, 'v1.0.20', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -180,41 +189,49 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0, 0);
 
         // ステージ表示
-        this.stageText = this.add.text(400, 50, '', {
+        this.stageText = this.add.text(640, 50, '', {
             fontSize: '28px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            backgroundColor: '#000000',
+            padding: { x: 15, y: 8 }
         }).setOrigin(0.5);
 
         // スコア表示
-        this.scoreText = this.add.text(100, 50, `まもった: ${this.gameState.score}`, {
+        this.scoreText = this.add.text(150, 50, `まもった: ${this.gameState.score}`, {
             fontSize: '20px',
             fill: '#FFFFFF',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#2d1b69',
+            padding: { x: 10, y: 5 }
         }).setOrigin(0.5);
 
         // 難易度表示（画面左下）
-        this.difficultyText = this.add.text(20, 580, '', {
+        this.difficultyText = this.add.text(20, 700, '', {
             fontSize: '18px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            backgroundColor: '#000000',
+            padding: { x: 8, y: 4 }
         }).setOrigin(0, 1);
 
         // メッセージ表示エリア
-        this.messageText = this.add.text(400, 500, '', {
+        this.messageText = this.add.text(640, 600, '', {
             fontSize: '24px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            backgroundColor: '#000000',
+            padding: { x: 15, y: 8 }
         }).setOrigin(0.5);
 
         // シグナル表示（画面上部）
         this.signalGraphics = this.add.graphics().setVisible(false);
         
         // 危険マーク用のテキスト（シンプルな警告マーク）
-        this.signalText = this.add.text(400, 120, '⚠', {
+        this.signalText = this.add.text(640, 150, '⚠', {
             fontSize: '120px',
             fill: '#FF0000',
             fontFamily: 'Arial',
@@ -225,7 +242,7 @@ class GameScene extends Phaser.Scene {
 
         // フレーム数表示（デジタル時計風）
         this.frameCounter = 0;
-        this.frameCounterText = this.add.text(750, 550, '', {
+        this.frameCounterText = this.add.text(1230, 660, '', {
             fontSize: '20px',
             fill: '#00FF00',
             fontFamily: 'Courier',
@@ -238,7 +255,7 @@ class GameScene extends Phaser.Scene {
 
     setupCharacters() {
         // プレイヤーキャラクター
-        this.player = this.add.image(200, 300, 'playerNormal').setOrigin(0.5);
+        this.player = this.add.image(250, 360, 'playerNormal').setOrigin(0.5);
 
         // IT資産と敵をステージに応じて設定
         this.updateStageAssets();
@@ -259,10 +276,10 @@ class GameScene extends Phaser.Scene {
         if (this.enemy) this.enemy.destroy();
 
         // IT資産（守るべき対象）
-        this.itAsset = this.add.image(400, 300, currentItAsset).setOrigin(0.5);
+        this.itAsset = this.add.image(640, 360, currentItAsset).setOrigin(0.5);
 
         // 敵キャラクター
-        this.enemy = this.add.image(600, 300, currentThreat).setOrigin(0.5);
+        this.enemy = this.add.image(1030, 360, currentThreat).setOrigin(0.5);
     }
 
     setupInput() {
@@ -325,7 +342,7 @@ class GameScene extends Phaser.Scene {
 
     startFadeTransition() {
         // 暗転
-        const fadeRect = this.add.rectangle(400, 300, 800, 600, 0x000000, 0.8);
+        const fadeRect = this.add.rectangle(512, 300, 1024, 600, 0x000000, 0.8);
         
         this.time.delayedCall(500, () => {
             fadeRect.destroy();
@@ -359,7 +376,7 @@ class GameScene extends Phaser.Scene {
 
     showBuildupSequence() {
         // 背景を徐々に危険な色に変化させる
-        const dangerOverlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0);
+        const dangerOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0);
         
         // 第1段階: 静寂（1秒）- 背景が少し暗くなる
         this.showMessage('...', 1000, () => {
@@ -415,7 +432,7 @@ class GameScene extends Phaser.Scene {
         // 背景に赤い円を追加
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0xFF0000, 0.3);
-        this.signalGraphics.fillCircle(400, 120, 80);
+        this.signalGraphics.fillCircle(512, 120, 80);
         this.signalGraphics.setVisible(true);
         
         // シグナルの点滅エフェクト
@@ -519,7 +536,7 @@ class GameScene extends Phaser.Scene {
         // 背景を赤に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0xFF4444, 0.4);
-        this.signalGraphics.fillCircle(400, 120, 80);
+        this.signalGraphics.fillCircle(512, 120, 80);
         this.signalGraphics.setVisible(true);
         
         // 点滅停止
@@ -543,7 +560,7 @@ class GameScene extends Phaser.Scene {
         // 背景を緑に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0x00FF00, 0.3);
-        this.signalGraphics.fillCircle(400, 120, 80);
+        this.signalGraphics.fillCircle(512, 120, 80);
         
         // 点滅停止
         this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
@@ -601,7 +618,7 @@ class GameScene extends Phaser.Scene {
         // 背景を赤に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0xFF0000, 0.4);
-        this.signalGraphics.fillCircle(400, 120, 80);
+        this.signalGraphics.fillCircle(512, 120, 80);
         
         // 点滅停止
         this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
@@ -642,7 +659,7 @@ class GameScene extends Phaser.Scene {
 
     showShieldEffect() {
         // シンプルなシールドエフェクト
-        const shield = this.add.circle(400, 300, 100, 0x3B82F6, 0.5);
+        const shield = this.add.circle(512, 300, 100, 0x3B82F6, 0.5);
         
         this.tweens.add({
             targets: shield,
@@ -699,16 +716,16 @@ class GameScene extends Phaser.Scene {
         }
         
         // ゲームオーバー時の選択肢
-        const buttonY = 450;
+        const buttonY = 540;
         
-        const retryButton = this.add.image(300, buttonY, 'retryButton')
+        const retryButton = this.add.image(520, buttonY, 'retryButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 this.restartCurrentStage();
             });
             
-        const endButton = this.add.text(500, buttonY, 'おわり', {
+        const endButton = this.add.text(760, buttonY, 'おわり', {
             fontSize: '24px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -759,7 +776,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.19', {
+        this.add.text(20, 20, 'v1.0.20', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -768,7 +785,7 @@ class EndingScene extends Phaser.Scene {
         }).setOrigin(0, 0);
 
         // 背景
-        this.add.rectangle(400, 300, 800, 600, 0x6B46C1);
+        this.add.rectangle(640, 360, 1280, 720, 0x6B46C1);
 
         if (this.isGameOver) {
             this.showGameOverEnding();
@@ -783,60 +800,76 @@ class EndingScene extends Phaser.Scene {
     }
 
     showVictoryEnding() {
-        this.add.text(400, 150, 'ぜんぶクリア！', {
+        this.add.text(640, 180, 'ぜんぶクリア！', {
             fontSize: '48px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            backgroundColor: '#000000',
+            padding: { x: 20, y: 10 }
         }).setOrigin(0.5);
 
-        this.add.text(400, 220, 'DXCのみらいのIT(アイティー)まもりたいだね！', {
+        this.add.text(640, 260, 'DXCのみらいのIT(アイティー)まもりたいだね！', {
             fontSize: '24px',
             fill: '#FFFFFF',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#2d1b69',
+            padding: { x: 15, y: 8 }
         }).setOrigin(0.5);
 
-        this.add.text(400, 280, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
+        this.add.text(640, 330, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
             fontSize: '20px',
             fill: '#10B981',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
     }
 
     showGameOverEnding() {
-        this.add.text(400, 200, 'ゲームしゅうりょう', {
+        this.add.text(640, 240, 'ゲームしゅうりょう', {
             fontSize: '36px',
             fill: '#FFFFFF',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#2d1b69',
+            padding: { x: 18, y: 9 }
         }).setOrigin(0.5);
 
-        this.add.text(400, 260, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
+        this.add.text(640, 310, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
             fontSize: '20px',
             fill: '#10B981',
-            fontFamily: 'Arial'
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
     }
 
     showDXCBranding() {
-        this.add.text(400, 350, 'DXC Technology', {
+        this.add.text(640, 420, 'DXC Technology', {
             fontSize: '32px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            backgroundColor: '#2d1b69',
+            padding: { x: 16, y: 8 }
         }).setOrigin(0.5);
 
-        this.add.text(400, 400, 'ファミリーデイにさんかしてくれて\nありがとうございます', {
+        this.add.text(640, 480, 'ファミリーデイにさんかしてくれて\nありがとうございます', {
             fontSize: '18px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            align: 'center'
+            align: 'center',
+            backgroundColor: '#000000',
+            padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
 
-        this.add.text(400, 480, 'また来年のファミリーデイで\nおあいしましょう！', {
+        this.add.text(640, 580, 'また来年のファミリーデイで\nおあいしましょう！', {
             fontSize: '16px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
-            align: 'center'
+            align: 'center',
+            backgroundColor: '#2d1b69',
+            padding: { x: 10, y: 5 }
         }).setOrigin(0.5);
 
         // 5秒後にタイトル画面に戻る
@@ -866,15 +899,15 @@ window.addEventListener('error', (event) => {
 // ゲーム設定
 const gameConfig = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 720,
     backgroundColor: '#1a1a2e',
     parent: 'game-container',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        min: { width: 320, height: 240 },
-        max: { width: 1200, height: 900 }
+        min: { width: 640, height: 360 },
+        max: { width: 1920, height: 1080 }
     },
     physics: {
         default: 'arcade',
