@@ -26,11 +26,8 @@
 - **player_character_damaged.png** (64x64px)
   - 用### バージョン履歴
 
-- **v1.0.13**: 無限モード超高難易度化（レベル10で11フレーム反応要求、ステージ名簡素化）
-- **v1.0.12**: 無限モード強化（ステージ6以降の難易度調整とアセット循環）
-- **v1.0.11**: 時間切れ時・早期クリック時のフレームカウンター表示問題修正
-- **v1.0.10**: シグナル表示クリア問題修正、ファイル名変更（signal_button_\* → signal_\*)
-- **v1.0.9**: シンボルベースUI実装、背景円エフェクト追加イヤーキャラクター - 被ダメージ状態
+- **v1.1.1**: 防衛対象（IT資産）の表示を削除、プレイヤーキャラクターのサイズ・位置調整、ファイル名をplayer_character_normal.pngに統一
+- **v1.1.0**: プレイヤーキャラクターを新しいPNG画像に置き換え、スケール・位置調整イヤーキャラクター - 被ダメージ状態
   - デザイン: 少し困った表情、シールドが少し傷ついている
   - 表情: 「やられた！」という感じ
 
@@ -45,105 +42,15 @@
   - 表情: 誇らしげで嬉しそう
 
 #### 守るべきIT資産（防御目標）
-- **protected_pc_normal.png** (64x64px)
-  - 用途: 守るべき対象1 - パソコン - 通常状態
-  - デザイン: 可愛いデスクトップPC、安全時は青い光
-  - 色: グレー/青ベース、DXCアクセント
+**注意: v1.1.1で防衛対象の表示を削除しました。以下のアセットは現在使用されていません。**
 
-- **protected_pc_damaged.png** (64x64px)
-  - 用途: パソコン - 被ダメージ状態
-  - デザイン: 画面にエラー表示、少し煙が出ている
-  - 色: 警告の赤いライト
+- ~~protected_pc_normal.png~~ (64x64px) - 削除済み
+- ~~protected_iot_normal.png~~ (64x64px) - 削除済み  
+- ~~protected_laptop_normal.png~~ (64x64px) - 削除済み
+- ~~protected_cloud_normal.png~~ (64x64px) - 削除済み
+- ~~protected_ai_normal.png~~ (64x64px) - 削除済み
 
-- **protected_pc_ko.png** (64x64px)
-  - 用途: パソコン - ばたんきゅー状態
-  - デザイン: ブルースクリーン、完全停止状態
-  - 色: 青いエラー画面
-
-- **protected_pc_victory.png** (64x64px)
-  - 用途: パソコン - 勝利状態
-  - デザイン: 画面に「✓」マーク、安全を示す緑の光
-  - 色: 安全な緑色の輝き
-
-- **protected_iot_normal.png** (64x64px)
-  - 用途: 守るべき対象2 - IoT - 通常状態
-  - デザイン: 複数の小さなスマートデバイスが繋がっている感じ
-  - 色: 青/緑ベース、接続を示すライトや波線エフェクト
-
-- **protected_iot_damaged.png** (64x64px)
-  - 用途: IoT - 被ダメージ状態
-  - デザイン: 一部のデバイスの接続が切れている、点滅する警告
-  - 色: 黄色の警告ライト
-
-- **protected_iot_ko.png** (64x64px)
-  - 用途: IoT - ばたんきゅー状態
-  - デザイン: 全デバイスが接続切れ、バラバラになっている
-  - 色: 赤い切断状態
-
-- **protected_iot_victory.png** (64x64px)
-  - 用途: IoT - 勝利状態
-  - デザイン: すべてのデバイスが完璧に接続、安全な通信
-  - 色: 安定した青/緑の接続線
-
-- **protected_laptop_normal.png** (64x64px)
-  - 用途: 守るべき対象3 - ノートPC - 通常状態
-  - デザイン: 開いたノートPC、画面に正常動作表示
-  - 色: シルバー/グレー、DXCロゴ風装飾
-
-- **protected_laptop_damaged.png** (64x64px)
-  - 用途: ノートPC - 被ダメージ状態
-  - デザイン: 画面が一部乱れている、バッテリー警告
-  - 色: 黄色の警告表示
-
-- **protected_laptop_ko.png** (64x64px)
-  - 用途: ノートPC - ばたんきゅー状態
-  - デザイン: 画面真っ黒、蓋が半分閉じている
-  - 色: 完全に暗い状態
-
-- **protected_laptop_victory.png** (64x64px)
-  - 用途: ノートPC - 勝利状態
-  - デザイン: 明るい画面、完璧な動作状態
-  - 色: 清潔な白/青の画面
-
-- **protected_cloud_normal.png** (64x64px)
-  - 用途: 守るべき対象4 - クラウド - 通常状態
-  - デザイン: 雲の形、データが安全に浮遊している感じ
-  - 色: 白/青グラデーション、安全なキラキラエフェクト
-
-- **protected_cloud_damaged.png** (64x64px)
-  - 用途: クラウド - 被ダメージ状態
-  - デザイン: 雲が少し暗くなり、データが不安定
-  - 色: グレー/黄色、不安定な状態
-
-- **protected_cloud_ko.png** (64x64px)
-  - 用途: クラウド - ばたんきゅー状態
-  - デザイン: 黒い雲、雷が落ちている状態
-  - 色: 黒/赤、危険な嵐状態
-
-- **protected_cloud_victory.png** (64x64px)
-  - 用途: クラウド - 勝利状態
-  - デザイン: 輝く白い雲、完璧なデータ同期
-  - 色: 純白/金色、神々しい輝き
-
-- **protected_ai_normal.png** (64x64px)
-  - 用途: 守るべき対象5 - AI - 通常状態
-  - デザイン: 脳のような形またはロボットの頭、ニューラルネットワーク模様
-  - 色: 青/紫グラデーション、知的な光を放つエフェクト
-
-- **protected_ai_damaged.png** (64x64px)
-  - 用途: AI - 被ダメージ状態
-  - デザイン: ニューラルネットワークの一部が切断、処理速度低下
-  - 色: 黄/赤、警告状態
-
-- **protected_ai_ko.png** (64x64px)
-  - 用途: AI - ばたんきゅー状態
-  - デザイン: 完全に思考停止、回路がショート
-  - 色: 黒/赤、完全停止
-
-- **protected_ai_victory.png** (64x64px)
-  - 用途: AI - 勝利状態
-  - デザイン: 完璧なニューラルネットワーク、最適化された思考
-  - 色: 明るい青/白、最高の知能状態
+各種状態（damaged、ko、victory）のアセットも同様に削除済み。
 
 #### 脅威・敵キャラクター
 - **threat_malware_normal.png** (48x48px)
@@ -365,9 +272,9 @@
 **注意**: v1.0.9では一時的にテキストシンボル（⚠、✓、✕）を使用していますが、コードでは上記のSVGファイルを参照しています。シグナル表示は本ゲームの**コア機能**です。
 
 ### 高優先度（見栄えに重要）
-1. player_character_normal.png
-2. protected_pc_normal.png（最も基本的な守るべき対象）
-3. threat_malware_normal.png（最も基本的な脅威）
+1. **player_character_normal.png** - プレイヤーキャラクター（使用中）
+2. **threat_malware_normal.svg** - マルウェア脅威（使用中）
+3. **threat_system_error_normal.svg** - システム障害脅威（使用中）
 4. start_button.png
 5. retry_button.png
 6. background_menu.png
@@ -376,30 +283,27 @@
 ### 中優先度（あると良い）
 1. player_character_damaged.png（プレイヤーダメージ状態）
 2. player_character_victory.png（プレイヤー勝利状態）
-3. protected_pc_damaged.png（PC被ダメージ）
-4. protected_pc_victory.png（PC防御成功）
-5. threat_malware_damaged.png（マルウェア弱体化）
-6. threat_malware_ko.png（マルウェア撃破）
-7. protected_iot_normal.png（2番目のIT資産）
-8. threat_system_error_normal.png（2番目の脅威）
-9. background_game.png
-10. shield_effect.png
-11. star_particle.png
-12. menu_bgm.mp3
-13. game_bgm.mp3
+3. threat_malware_damaged.png（マルウェア弱体化）
+4. threat_malware_ko.png（マルウェア撃破）
+5. threat_system_error_damaged.png（システム障害弱体化）
+6. threat_system_error_ko.png（システム障害撃破）
+7. background_game.png
+8. shield_effect.png
+9. star_particle.png
+10. menu_bgm.mp3
+11. game_bgm.mp3
 
 ### 低優先度（最後に追加）
 1. player_character_ko.png（プレイヤー完全敗北）
 2. player_character_cutin.png（プレイヤーカットイン）
 3. threat_malware_cutin.png（マルウェアカットイン）
-4. protected_iot_damaged.png, protected_iot_victory.png（IoT状態別）
-5. protected_cloud_normal.png（4番目のIT資産）
-6. protected_ai_normal.png（5番目のIT資産、最新技術として）
-7. threat_disaster_normal.png（4番目の脅威）
-8. threat_ai_poison_normal.png（5番目の脅威、AI特化）
-9. 全キャラクターの残りの状態別画像
-10. 全脅威のカットイン画像
-11. dxc_logo.png
+4. threat_system_error_cutin.png（システム障害カットイン）
+5. threat_cyber_attack_normal.png（3番目の脅威）
+6. threat_disaster_normal.png（4番目の脅威）
+7. threat_ai_poison_normal.png（5番目の脅威、AI特化）
+8. 全キャラクターの残りの状態別画像
+9. 全脅威のカットイン画像
+10. dxc_logo.png
 
 ## 4. ファイル命名規則
 

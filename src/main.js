@@ -41,10 +41,6 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('heroVictory', 'assets/gen/images/player_character_normal.png');
         this.load.image('heroKo', 'assets/gen/images/player_character_normal.png');
         
-        this.load.svg('pcNormal', 'assets/images/protected_pc_normal.svg', { width: 64, height: 64 });
-        this.load.svg('cloudNormal', 'assets/images/protected_cloud_normal.svg', { width: 64, height: 64 });
-        this.load.svg('aiNormal', 'assets/images/protected_ai_normal.svg', { width: 64, height: 64 });
-        
         this.load.svg('malwareNormal', 'assets/images/threat_malware_normal.svg', { width: 48, height: 48 });
         this.load.svg('systemErrorNormal', 'assets/images/threat_system_error_normal.svg', { width: 48, height: 48 });
         
@@ -142,7 +138,6 @@ class GameScene extends Phaser.Scene {
         this.gameState = {
             stage: 1,
             score: 0, // デフォルト値
-            itAssetState: 'normal',
             playerState: 'normal',
             enemyState: 'normal',
             isGameActive: false,
@@ -251,26 +246,20 @@ class GameScene extends Phaser.Scene {
         // プレイヤーキャラクター
         this.player = this.add.image(300, 500, 'heroNormal').setOrigin(0.5).setScale(0.3);
 
-        // IT資産と敵をステージに応じて設定
+        // 敵をステージに応じて設定
         this.updateStageAssets();
     }
 
     updateStageAssets() {
-        // IT資産の種類をステージに応じて変更（1-4のサイクルで統一）
-        const itAssets = ['pcNormal', 'pcNormal', 'cloudNormal', 'cloudNormal'];
-        const threats = ['malwareNormal', 'malwareNormal', 'systemErrorNormal', 'systemErrorNormal'];
+        // 敵の種類をステージに応じて変更（1-2のサイクルで統一）
+        const threats = ['malwareNormal', 'systemErrorNormal'];
         
-        // 全ステージで1-4のサイクルを使用
-        const cycleIndex = (this.gameState.stage - 1) % 4;
-        const currentItAsset = itAssets[cycleIndex] || 'pcNormal';
+        // 全ステージで1-2のサイクルを使用
+        const cycleIndex = (this.gameState.stage - 1) % 2;
         const currentThreat = threats[cycleIndex] || 'malwareNormal';
 
         // 既存のスプライトを削除して新しいものを作成
-        if (this.itAsset) this.itAsset.destroy();
         if (this.enemy) this.enemy.destroy();
-
-        // IT資産（守るべき対象）
-        this.itAsset = this.add.image(640, 360, currentItAsset).setOrigin(0.5);
 
         // 敵キャラクター
         this.enemy = this.add.image(1030, 360, currentThreat).setOrigin(0.5);
@@ -345,7 +334,6 @@ class GameScene extends Phaser.Scene {
     }
 
     resetCharacterStates() {
-        this.gameState.itAssetState = 'normal';
         this.gameState.playerState = 'normal';
         this.gameState.enemyState = 'normal';
         this.gameState.isWaiting = false;
@@ -565,7 +553,6 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(500, () => {
             // キャラクター状態更新
             this.gameState.enemyState = 'ko';
-            this.gameState.itAssetState = 'victory';
             this.gameState.playerState = 'victory';
             this.updateCharacterSprites();
             
@@ -620,9 +607,8 @@ class GameScene extends Phaser.Scene {
         this.signalText.setAlpha(1);
         this.signalGraphics.setAlpha(1);
         
-        if (this.gameState.itAssetState === 'normal') {
+        if (this.gameState.playerState === 'normal') {
             // 1回目の失敗
-            this.gameState.itAssetState = 'damaged';
             this.gameState.playerState = 'damaged';
             this.gameState.enemyState = 'victory';
             
@@ -640,7 +626,6 @@ class GameScene extends Phaser.Scene {
             });
         } else {
             // 2回目の失敗（ゲームオーバー）
-            this.gameState.itAssetState = 'ko';
             this.gameState.playerState = 'ko';
             this.gameState.enemyState = 'victory';
             
