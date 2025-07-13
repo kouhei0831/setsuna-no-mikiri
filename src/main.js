@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.3', {
+        this.add.text(20, 20, 'v1.0.4', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -160,7 +160,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.3', {
+        this.versionText = this.add.text(20, 20, 'v1.0.4', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -392,7 +392,8 @@ class GameScene extends Phaser.Scene {
         this.signalButton.setTexture('signalError').setVisible(true);
         
         this.showMessage('はやすぎ！おてつき！', 1500, () => {
-            // ミス一回と同じ処理
+            // シグナルを非表示にしてからミス処理
+            this.signalButton.setVisible(false);
             this.onDefenseFail();
         });
     }
@@ -585,7 +586,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.3', {
+        this.add.text(20, 20, 'v1.0.4', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
