@@ -39,7 +39,7 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('heroNormal', 'assets/gen/images/player_character_normal.png');
         this.load.image('heroDefending', 'assets/gen/images/player_character_defending.png');
         this.load.image('heroDamaged', 'assets/gen/images/player_character_normal.png');
-        this.load.image('heroVictory', 'assets/gen/images/player_character_normal.png');
+        this.load.image('heroVictory', 'assets/gen/images/player_character_victory.png');
         this.load.image('heroKo', 'assets/gen/images/player_character_normal.png');
         
         this.load.svg('malwareNormal', 'assets/images/threat_malware_normal.svg', { width: 48, height: 48 });
@@ -70,7 +70,7 @@ class MenuScene extends Phaser.Scene {
         this.add.image(640, 360, 'menuBackground').setScale(1.6);
 
         // バージョン表示（背景の後に配置して最前面に）
-        this.add.text(20, 20, 'v1.1.2', {
+        this.add.text(20, 20, 'v1.1.4', {
             fontSize: '18px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -160,7 +160,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
         // ゲーム背景画像（生成されたサイバー背景を適切なサイズで表示）
-        this.add.image(640, 360, 'gameBackground').setScale(1.0);
+        this.add.image(640, 360, 'gameBackground').setScale(1.0).setDepth(-100); // 最背面に配置
 
         this.setupUI();
         this.setupCharacters();
@@ -587,8 +587,16 @@ class GameScene extends Phaser.Scene {
                     this.scoreText.setText(`まもった: ${this.gameState.score}`);
                     
                     this.time.delayedCall(600, () => {
+                        // ステージクリア時に勝利ポーズに変更
+                        this.gameState.playerState = 'victory';
+                        this.updateCharacterSprites();
+                        
+                        // 勝利エフェクトを追加（一時的に無効化）
+                        // console.log('Calling showVictoryEffect'); // デバッグ用
+                        // this.showVictoryEffect();
+                        
                         this.showMessage('ステージクリア！', 1200, () => {
-                            // ステージクリア時に通常状態に戻してから次ステージへ
+                            // メッセージ表示後に通常状態に戻してから次ステージへ
                             this.gameState.playerState = 'normal';
                             this.updateCharacterSprites();
                             this.nextStage();
@@ -671,18 +679,113 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    showVictoryEffect() {
+        // プレイヤーキャラクターの位置を取得
+        const playerX = this.player.x;
+        const playerY = this.player.y;
+        
+        console.log('Victory effect triggered at:', playerX, playerY); // デバッグ用
+        
+        // 星の粒子エフェクト（複数の星を作成）
+        for (let i = 0; i < 8; i++) {
+            const star = this.add.circle(
+                playerX + (Math.random() - 0.5) * 100, // プレイヤー周辺にランダム配置
+                playerY + (Math.random() - 0.5) * 100,
+                8, // 星のサイズを少し大きく
+                0xFFD700, // 金色
+                1
+            ).setDepth(1500); // 高い深度で前面に表示
+            
+            console.log('Star created at:', star.x, star.y); // デバッグ用
+            
+            // 星の動きとフェードアウト
+            this.tweens.add({
+                targets: star,
+                x: star.x + (Math.random() - 0.5) * 200, // ランダムな方向に移動
+                y: star.y - Math.random() * 100 - 50, // 上に向かって移動
+                scaleX: 0.2,
+                scaleY: 0.2,
+                alpha: 0,
+                duration: 1500 + Math.random() * 500, // 少し長めに
+                ease: 'Power2',
+                onComplete: () => {
+                    star.destroy();
+                }
+            });
+        }
+        
+        // 光の輪エフェクト
+        const lightRing = this.add.circle(playerX, playerY, 30, 0xFFFFFF, 0.8).setDepth(1400);
+        console.log('Light ring created at:', lightRing.x, lightRing.y); // デバッグ用
+        
+        this.tweens.add({
+            targets: lightRing,
+            scaleX: 4,
+            scaleY: 4,
+            alpha: 0,
+            duration: 1000,
+            ease: 'Power2',
+            onComplete: () => {
+                lightRing.destroy();
+            }
+        });
+        
+        // 文字エフェクト「やったー！」
+        const victoryText = this.add.text(playerX, playerY - 50, 'やったー！', {
+            fontSize: '32px',
+            fill: '#FFD700',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            stroke: '#FFFFFF',
+            strokeThickness: 3
+        }).setOrigin(0.5).setDepth(1600);
+        
+        this.tweens.add({
+            targets: victoryText,
+            y: victoryText.y - 80,
+            alpha: 0,
+            scaleX: 1.5,
+            scaleY: 1.5,
+            duration: 1200,
+            ease: 'Power2',
+            onComplete: () => {
+                victoryText.destroy();
+            }
+        });
+    }
+
     updateCharacterSprites() {
         // プレイヤー状態に応じてスプライト更新
         if (this.gameState.playerState === 'defending') {
-            this.player.setTexture('heroDefending').setScale(0.4); // 防御時は少し大きく
+            this.player.setTexture('heroDefending').setScale(0.35).setY(500);
+            // 前進アニメーション（右に80px）
+            this.tweens.add({
+                targets: this.player,
+                x: 380,
+                duration: 150,
+                ease: 'Power2',
+            });
         } else if (this.gameState.playerState === 'damaged') {
-            this.player.setTexture('heroDamaged').setScale(0.3);
+            this.player.setTexture('heroDamaged').setScale(0.3).setY(500).setX(300);
         } else if (this.gameState.playerState === 'victory') {
-            this.player.setTexture('heroVictory').setScale(0.3);
+            this.player.setTexture('heroVictory').setScale(0.35).setY(450).setX(300); // 勝利時は少し大きく、ジャンプして上に
+            
+            // 勝利時のジャンプエフェクト
+            this.tweens.add({
+                targets: this.player,
+                y: 420, // さらに上に
+                duration: 300,
+                ease: 'Power2',
+                yoyo: true,
+                repeat: 1, // 2回ジャンプ
+                onComplete: () => {
+                    this.player.setY(500); // 最終位置に戻す
+                }
+            });
         } else if (this.gameState.playerState === 'ko') {
-            this.player.setTexture('heroKo').setScale(0.3);
+            this.player.setTexture('heroKo').setScale(0.3).setY(500).setX(300);
         } else {
-            this.player.setTexture('heroNormal').setScale(0.3);
+            this.player.setTexture('heroNormal').setScale(0.3).setY(500).setX(300);
         }
     }
 
