@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.13', {
+        this.add.text(20, 20, 'v1.0.15', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.13', {
+        this.versionText = this.add.text(20, 20, 'v1.0.15', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -289,19 +289,29 @@ class GameScene extends Phaser.Scene {
     }
 
     showStageInfo() {
-        const stageNames = ['PC(ピーシー)', 'サーバー', 'クラウド', 'AI(エーアイ)', 'ネットワーク'];
+        const baseStageNames = ['PC(ピーシー)', 'サーバー', 'クラウド', 'AI(エーアイ)', 'ネットワーク'];
         let stageName;
+        let difficultyLabel = '';
         
         if (this.gameState.stage <= 5) {
-            stageName = stageNames[this.gameState.stage - 1] || 'IT';
+            // ステージ1-5: 通常
+            stageName = baseStageNames[this.gameState.stage - 1] || 'IT';
+        } else if (this.gameState.stage <= 10) {
+            // ステージ6-10: ハード
+            const cycleStage = ((this.gameState.stage - 6) % 5) + 1; // 1-5のサイクル
+            stageName = baseStageNames[cycleStage - 1] || 'IT';
+            difficultyLabel = '(ハード)';
         } else {
-            // ステージ6以降: シンプルにIT表記
-            stageName = 'IT';
+            // ステージ11以降: エクストリーム
+            const cycleStage = ((this.gameState.stage - 11) % 5) + 1; // 1-5のサイクル
+            stageName = baseStageNames[cycleStage - 1] || 'IT';
+            difficultyLabel = '(エクストリーム)';
         }
         
-        this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
+        const fullStageName = stageName + difficultyLabel;
+        this.stageText.setText(`レベル ${this.gameState.stage}: ${fullStageName}をまもろう`);
         
-        this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
+        this.showMessage(`レベル ${this.gameState.stage}: ${fullStageName}をまもろう`, 2000, () => {
             this.startFadeTransition();
         });
     }
@@ -419,18 +429,32 @@ class GameScene extends Phaser.Scene {
         
         this.gameState.isGameActive = true;
         
-        // ステージに応じた制限時間（段階的に難易度上昇）
-        let timeLimit;
+        // ステージに応じた制限時間（指定されたフレーム数ベース）
+        let targetFrames;
+        
         if (this.gameState.stage <= 5) {
-            // ステージ1-5: 基本的な難易度上昇
-            timeLimit = Math.max(1000, 3000 - (this.gameState.stage * 300));
+            // ステージ1-5: 通常難易度
+            const normalFrames = [120, 90, 60, 40, 30];
+            targetFrames = normalFrames[this.gameState.stage - 1];
+        } else if (this.gameState.stage <= 10) {
+            // ステージ6-10: ハード難易度
+            const hardFrames = [20, 18, 16, 14, 12];
+            const hardIndex = (this.gameState.stage - 6) % 5;
+            targetFrames = hardFrames[hardIndex];
         } else {
-            // ステージ6以降: 無限モード（非常に難しく）
-            // レベル10で約11フレーム（183ms）を目標とする
-            const baseDifficulty = 1000; // 1秒スタート
-            const stageAfter5 = this.gameState.stage - 5;
-            timeLimit = Math.max(183, baseDifficulty - (stageAfter5 * 163));
+            // ステージ11-15: エクストリーム難易度
+            const extremeFrames = [14, 13, 12, 11, 10];
+            const extremeIndex = Math.min((this.gameState.stage - 11) % 5, 4);
+            targetFrames = extremeFrames[extremeIndex];
+            
+            // ステージ16以降はエクストリーム最終値（10フレーム）で固定
+            if (this.gameState.stage > 15) {
+                targetFrames = 10;
+            }
         }
+        
+        // フレーム数をミリ秒に変換（60fps = 16.67ms/frame）
+        const timeLimit = Math.round(targetFrames * 16.67);
         
         this.defenseTimer = this.time.delayedCall(timeLimit, () => {
             if (this.gameState.isGameActive) {
@@ -724,7 +748,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.13', {
+        this.add.text(20, 20, 'v1.0.15', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
