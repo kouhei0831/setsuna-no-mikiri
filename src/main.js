@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.4', {
+        this.add.text(20, 20, 'v1.0.5', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -160,7 +160,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.4', {
+        this.versionText = this.add.text(20, 20, 'v1.0.5', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -337,6 +337,11 @@ class GameScene extends Phaser.Scene {
     }
 
     showWarningSignal() {
+        // お手付き処理済みの場合は何もしない
+        if (!this.gameState.isWaiting && !this.gameState.isGameActive) {
+            return;
+        }
+        
         // 待機状態終了
         this.gameState.isWaiting = false;
         
@@ -384,9 +389,18 @@ class GameScene extends Phaser.Scene {
     onEarlyClick() {
         // お手付き処理（待機状態を停止）
         this.gameState.isWaiting = false;
+        this.gameState.isGameActive = false;
         
-        // 進行中のタイマーを全て停止
+        // 進行中のタイマーとトゥイーンを全て停止
         this.time.removeAllEvents();
+        this.tweens.killAll();
+        
+        // 背景オーバーレイがあれば削除
+        this.children.getChildren().forEach(child => {
+            if (child.type === 'Rectangle' && child.alpha > 0 && child.fillColor !== 0x16213e) {
+                child.destroy();
+            }
+        });
         
         // シグナルを赤色（エラー）に変更
         this.signalButton.setTexture('signalError').setVisible(true);
@@ -586,7 +600,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.4', {
+        this.add.text(20, 20, 'v1.0.5', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
