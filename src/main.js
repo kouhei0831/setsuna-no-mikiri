@@ -189,7 +189,7 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             backgroundColor: '#000000',
             padding: { x: 15, y: 8 }
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setVisible(false);
 
         // スコア表示
         this.scoreText = this.add.text(150, 50, `まもった: ${this.gameState.score}`, {
@@ -208,7 +208,7 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             backgroundColor: '#000000',
             padding: { x: 8, y: 4 }
-        }).setOrigin(0, 1);
+        }).setOrigin(0, 1).setVisible(false);
 
         // メッセージ表示エリア
         this.messageText = this.add.text(640, 600, '', {
@@ -218,7 +218,7 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             backgroundColor: '#000000',
             padding: { x: 15, y: 8 }
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setVisible(false);
 
         // シグナル表示（画面上部）
         this.signalGraphics = this.add.graphics().setVisible(false);
@@ -323,22 +323,21 @@ class GameScene extends Phaser.Scene {
         
         // ステージ名表示（難易度なし）
         this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
+        this.stageText.setVisible(true);
         
         // 難易度表示更新
         this.difficultyText.setText(difficultyLabel);
         this.difficultyText.setFill(difficultyColor);
         
-        this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
-            this.startFadeTransition();
-        });
-    }
-
-    startFadeTransition() {
-        // 暗転
-        const fadeRect = this.add.rectangle(512, 300, 1024, 600, 0x000000, 0.8);
+        // 難易度がある場合のみ表示
+        if (difficultyLabel !== '') {
+            this.difficultyText.setVisible(true);
+        } else {
+            this.difficultyText.setVisible(false);
+        }
         
-        this.time.delayedCall(500, () => {
-            fadeRect.destroy();
+        this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
+            // 暗転エフェクトを削除し、直接次の処理に進む
             this.resetCharacterStates();
             this.startDefenseRound();
         });
@@ -372,37 +371,32 @@ class GameScene extends Phaser.Scene {
         const dangerOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0);
         
         // 第1段階: 静寂（1秒）- 背景が少し暗くなる
-        this.showMessage('...', 1000, () => {
+        this.time.delayedCall(1000, () => {
             this.tweens.add({
                 targets: dangerOverlay,
                 alpha: 0.2,
-                duration: 500
+                duration: 400
             });
             
-            // 第2段階: 警告音と警告メッセージ（1.5秒）- 背景が赤っぽくなる
-            this.showMessage('きけんが せっきん！', 1500, () => {
-                dangerOverlay.setFillStyle(0x330000); // 暗い赤
+            // 第2段階: 赤い警告開始 - 背景が赤っぽくなり、お手付き判定開始
+            this.time.delayedCall(800, () => {
+                dangerOverlay.setFillStyle(0x550000); // 濃い赤
+                
+                // ランダムな待機時間（0.7～0.8秒 = 700～800ms）
+                const randomWaitTime = 700 + Math.random() * 100;
+                
                 this.tweens.add({
                     targets: dangerOverlay,
-                    alpha: 0.4,
-                    duration: 750
-                });
-                
-                // 第3段階: 最終警告（1秒）- 背景がさらに赤く、ここから待機状態開始
-                this.showMessage('じゅんび...', 1000, () => {
-                    // 待機状態開始（お手付き検出開始）
-                    this.gameState.isWaiting = true;
-                    
-                    this.tweens.add({
-                        targets: dangerOverlay,
-                        alpha: 0.6,
-                        duration: 500,
-                        onComplete: () => {
-                            // 第4段階: シグナル表示時に背景をリセット
-                            dangerOverlay.destroy();
-                            this.showWarningSignal();
-                        }
-                    });
+                    alpha: 0.5,
+                    duration: randomWaitTime,
+                    onComplete: () => {
+                        // 待機状態開始（お手付き検出開始）
+                        this.gameState.isWaiting = true;
+                        
+                        // シグナル表示
+                        dangerOverlay.destroy();
+                        this.showWarningSignal();
+                    }
                 });
             });
         });
@@ -436,8 +430,6 @@ class GameScene extends Phaser.Scene {
             yoyo: true,
             repeat: -1
         });
-        
-        this.showMessage('あぶない！まもって！', 0);
         
         // フレームカウンター初期化・表示開始
         this.frameCounter = 0;
@@ -501,6 +493,9 @@ class GameScene extends Phaser.Scene {
     }
 
     onEarlyClick() {
+        // クリック時の画面揺らしエフェクト
+        this.cameras.main.shake(300, 0.015);
+        
         // お手付き処理（待機状態を停止）
         this.gameState.isWaiting = false;
         this.gameState.isGameActive = false;
@@ -546,6 +541,9 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseSuccess(reactionFrames) {
+        // クリック時の画面揺らしエフェクト
+        this.cameras.main.shake(200, 0.01);
+        
         // 成功時の処理
         this.signalText.setText('✓')
             .setFill('#00FF00');
@@ -697,6 +695,9 @@ class GameScene extends Phaser.Scene {
             this.signalGraphics.setVisible(false);
             this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
             this.messageText.setText('');
+            this.messageText.setVisible(false);
+            this.stageText.setVisible(false);
+            this.difficultyText.setVisible(false);
             this.updateStageAssets(); // 新しいステージのアセットを設定
             this.startStage();
         }
@@ -747,9 +748,26 @@ class GameScene extends Phaser.Scene {
     showMessage(text, duration, callback) {
         this.messageText.setText(text);
         
+        // テキストが空の場合は背景も非表示にする
+        if (text === '') {
+            this.messageText.setVisible(false);
+        } else {
+            this.messageText.setVisible(true);
+            
+            // 「...」メッセージの場合は背景色を無効にして黒い表示を防ぐ
+            if (text === '...') {
+                this.messageText.setStyle({ backgroundColor: null });
+            } else {
+                this.messageText.setStyle({ backgroundColor: '#000000' });
+            }
+        }
+        
         if (duration > 0) {
             this.time.delayedCall(duration, () => {
                 this.messageText.setText('');
+                this.messageText.setVisible(false);
+                // 背景色を元に戻す
+                this.messageText.setStyle({ backgroundColor: '#000000' });
                 if (callback) callback();
             });
         }
