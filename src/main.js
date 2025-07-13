@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.5', {
+        this.add.text(20, 20, 'v1.0.6', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -149,6 +149,13 @@ class GameScene extends Phaser.Scene {
         this.startStage();
     }
 
+    init(data) {
+        // リトライ時のスコア復元
+        if (data && data.preserveScore !== undefined) {
+            this.gameState.score = data.preserveScore;
+        }
+    }
+
     update() {
         // フレームカウンター更新
         if (this.gameState.isGameActive && this.frameCounterText && this.frameCounterText.visible) {
@@ -160,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.5', {
+        this.versionText = this.add.text(20, 20, 'v1.0.6', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -177,7 +184,7 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // スコア表示
-        this.scoreText = this.add.text(100, 50, 'まもった: 0', {
+        this.scoreText = this.add.text(100, 50, `まもった: ${this.gameState.score}`, {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial'
@@ -565,8 +572,9 @@ class GameScene extends Phaser.Scene {
     }
 
     restartCurrentStage() {
-        // 同じステージから再開
-        this.scene.restart();
+        // 現在のスコアを保持してステージを再開
+        const currentScore = this.gameState.score;
+        this.scene.restart({ preserveScore: currentScore });
     }
 
     showEndMessage() {
@@ -600,7 +608,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.5', {
+        this.add.text(20, 20, 'v1.0.6', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
