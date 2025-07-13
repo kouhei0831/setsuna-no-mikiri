@@ -185,7 +185,7 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             backgroundColor: '#000000',
             padding: { x: 15, y: 8 }
-        }).setOrigin(0.5).setVisible(false);
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // スコア表示
         this.scoreText = this.add.text(150, 50, `まもった: ${this.gameState.score}`, {
@@ -194,7 +194,7 @@ class GameScene extends Phaser.Scene {
             fontFamily: 'Arial',
             backgroundColor: '#2d1b69',
             padding: { x: 10, y: 5 }
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setDepth(1000);
 
         // 難易度表示（画面左下）
         this.difficultyText = this.add.text(20, 700, '', {
@@ -204,7 +204,7 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             backgroundColor: '#000000',
             padding: { x: 8, y: 4 }
-        }).setOrigin(0, 1).setVisible(false);
+        }).setOrigin(0, 1).setVisible(false).setDepth(1000);
 
         // メッセージ表示エリア
         this.messageText = this.add.text(640, 600, '', {
@@ -214,10 +214,10 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             backgroundColor: '#000000',
             padding: { x: 15, y: 8 }
-        }).setOrigin(0.5).setVisible(false);
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // シグナル表示（画面上部）
-        this.signalGraphics = this.add.graphics().setVisible(false);
+        this.signalGraphics = this.add.graphics().setVisible(false).setDepth(999);
         
         // 危険マーク用のテキスト（シンプルな警告マーク）
         this.signalText = this.add.text(640, 150, '⚠', {
@@ -227,7 +227,7 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold',
             stroke: '#FFFFFF',
             strokeThickness: 6
-        }).setOrigin(0.5).setVisible(false);
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // フレーム数表示（デジタル時計風）
         this.frameCounter = 0;
@@ -239,12 +239,12 @@ class GameScene extends Phaser.Scene {
             padding: { x: 8, y: 4 },
             stroke: '#008800',
             strokeThickness: 1
-        }).setOrigin(1, 1).setVisible(false);
+        }).setOrigin(1, 1).setVisible(false).setDepth(1000);
     }
 
     setupCharacters() {
         // プレイヤーキャラクター
-        this.player = this.add.image(300, 500, 'heroNormal').setOrigin(0.5).setScale(0.3);
+        this.player = this.add.image(300, 500, 'heroNormal').setOrigin(0.5).setScale(0.3).setDepth(100);
 
         // 敵をステージに応じて設定
         this.updateStageAssets();
@@ -262,7 +262,7 @@ class GameScene extends Phaser.Scene {
         if (this.enemy) this.enemy.destroy();
 
         // 敵キャラクター
-        this.enemy = this.add.image(1030, 360, currentThreat).setOrigin(0.5);
+        this.enemy = this.add.image(1030, 360, currentThreat).setOrigin(0.5).setDepth(100);
     }
 
     setupInput() {
