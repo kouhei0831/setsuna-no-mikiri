@@ -78,7 +78,7 @@ class MenuScene extends Phaser.Scene {
         }).setOrigin(0, 0);
 
         // 背景
-        this.add.image(640, 360, 'menuBackground').setDisplaySize(1280, 720);
+        this.add.image(640, 360, 'menuBackground').setScale(1.6);
 
         // タイトル
         this.add.text(640, 200, '刹那の見切り【テスト版】', {
@@ -160,8 +160,8 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        // ゲーム背景画像
-        this.add.image(640, 360, 'gameBackground').setDisplaySize(1280, 720);
+        // ゲーム背景画像（生成されたサイバー背景を適切なサイズで表示）
+        this.add.image(640, 360, 'gameBackground').setScale(1.0);
 
         this.setupUI();
         this.setupCharacters();
