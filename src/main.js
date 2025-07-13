@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.7', {
+        this.add.text(20, 20, 'v1.0.8', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.7', {
+        this.versionText = this.add.text(20, 20, 'v1.0.8', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -412,7 +412,7 @@ class GameScene extends Phaser.Scene {
         // シグナルを赤色（エラー）に変更
         this.signalButton.setTexture('signalError').setVisible(true);
         
-        this.showMessage('まだです！じゅんびまでまって！', 1500, () => {
+        this.showMessage('まだだよ！おちついて！', 1500, () => {
             // シグナルを非表示にしてからミス処理
             this.signalButton.setVisible(false);
             this.onDefenseFail();
@@ -608,7 +608,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.7', {
+        this.add.text(20, 20, 'v1.0.8', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
