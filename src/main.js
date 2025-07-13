@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.6', {
+        this.add.text(20, 20, 'v1.0.7', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.6', {
+        this.versionText = this.add.text(20, 20, 'v1.0.7', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -303,9 +303,6 @@ class GameScene extends Phaser.Scene {
     }
 
     showBuildupSequence() {
-        // 待機状態開始（お手付き検出開始）
-        this.gameState.isWaiting = true;
-        
         // 背景を徐々に危険な色に変化させる
         const dangerOverlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0);
         
@@ -326,8 +323,11 @@ class GameScene extends Phaser.Scene {
                     duration: 750
                 });
                 
-                // 第3段階: 最終警告（1秒）- 背景がさらに赤く
+                // 第3段階: 最終警告（1秒）- 背景がさらに赤く、ここから待機状態開始
                 this.showMessage('じゅんび...', 1000, () => {
+                    // 待機状態開始（お手付き検出開始）
+                    this.gameState.isWaiting = true;
+                    
                     this.tweens.add({
                         targets: dangerOverlay,
                         alpha: 0.6,
@@ -412,7 +412,7 @@ class GameScene extends Phaser.Scene {
         // シグナルを赤色（エラー）に変更
         this.signalButton.setTexture('signalError').setVisible(true);
         
-        this.showMessage('はやすぎ！おてつき！', 1500, () => {
+        this.showMessage('まだです！じゅんびまでまって！', 1500, () => {
             // シグナルを非表示にしてからミス処理
             this.signalButton.setVisible(false);
             this.onDefenseFail();
@@ -608,7 +608,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.6', {
+        this.add.text(20, 20, 'v1.0.7', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
