@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.15', {
+        this.add.text(20, 20, 'v1.0.17', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.15', {
+        this.versionText = this.add.text(20, 20, 'v1.0.17', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -189,6 +189,14 @@ class GameScene extends Phaser.Scene {
             fill: '#FFFFFF',
             fontFamily: 'Arial'
         }).setOrigin(0.5);
+
+        // 難易度表示（画面左下）
+        this.difficultyText = this.add.text(20, 580, '', {
+            fontSize: '18px',
+            fill: '#F59E0B',
+            fontFamily: 'Arial',
+            fontWeight: 'bold'
+        }).setOrigin(0, 1);
 
         // メッセージ表示エリア
         this.messageText = this.add.text(400, 500, '', {
@@ -233,27 +241,14 @@ class GameScene extends Phaser.Scene {
     }
 
     updateStageAssets() {
-        // IT資産の種類をステージに応じて変更
+        // IT資産の種類をステージに応じて変更（1-5のサイクルで統一）
         const itAssets = ['pcNormal', 'pcNormal', 'cloudNormal', 'aiNormal', 'aiNormal'];
         const threats = ['malwareNormal', 'malwareNormal', 'systemErrorNormal', 'systemErrorNormal', 'malwareNormal'];
         
-        let currentItAsset, currentThreat;
-        
-        if (this.gameState.stage <= 5) {
-            // ステージ1-5: 定義済みアセット
-            currentItAsset = itAssets[this.gameState.stage - 1] || 'pcNormal';
-            currentThreat = threats[this.gameState.stage - 1] || 'malwareNormal';
-        } else {
-            // ステージ6以降: 無限モード（サイクル）
-            const infiniteItAssets = ['aiNormal', 'cloudNormal', 'pcNormal'];
-            const infiniteThreats = ['systemErrorNormal', 'malwareNormal'];
-            
-            const itIndex = (this.gameState.stage - 6) % infiniteItAssets.length;
-            const threatIndex = (this.gameState.stage - 6) % infiniteThreats.length;
-            
-            currentItAsset = infiniteItAssets[itIndex];
-            currentThreat = infiniteThreats[threatIndex];
-        }
+        // 全ステージで1-5のサイクルを使用
+        const cycleIndex = (this.gameState.stage - 1) % 5;
+        const currentItAsset = itAssets[cycleIndex] || 'pcNormal';
+        const currentThreat = threats[cycleIndex] || 'malwareNormal';
 
         // 既存のスプライトを削除して新しいものを作成
         if (this.itAsset) this.itAsset.destroy();
@@ -290,28 +285,36 @@ class GameScene extends Phaser.Scene {
 
     showStageInfo() {
         const baseStageNames = ['PC(ピーシー)', 'サーバー', 'クラウド', 'AI(エーアイ)', 'ネットワーク'];
-        let stageName;
+        
+        // ステージ名は1-5のサイクルで統一
+        const cycleStage = ((this.gameState.stage - 1) % 5) + 1; // 1-5のサイクル
+        const stageName = baseStageNames[cycleStage - 1] || 'IT';
+        
+        // 難易度表示
         let difficultyLabel = '';
+        let difficultyColor = '#F59E0B'; // デフォルト色
         
         if (this.gameState.stage <= 5) {
-            // ステージ1-5: 通常
-            stageName = baseStageNames[this.gameState.stage - 1] || 'IT';
+            // ステージ1-5: 通常（表示なし）
+            difficultyLabel = '';
         } else if (this.gameState.stage <= 10) {
             // ステージ6-10: ハード
-            const cycleStage = ((this.gameState.stage - 6) % 5) + 1; // 1-5のサイクル
-            stageName = baseStageNames[cycleStage - 1] || 'IT';
-            difficultyLabel = '(ハード)';
+            difficultyLabel = 'ハードモード';
+            difficultyColor = '#FF6B35';
         } else {
             // ステージ11以降: エクストリーム
-            const cycleStage = ((this.gameState.stage - 11) % 5) + 1; // 1-5のサイクル
-            stageName = baseStageNames[cycleStage - 1] || 'IT';
-            difficultyLabel = '(エクストリーム)';
+            difficultyLabel = 'エクストリームモード';
+            difficultyColor = '#FF0000';
         }
         
-        const fullStageName = stageName + difficultyLabel;
-        this.stageText.setText(`レベル ${this.gameState.stage}: ${fullStageName}をまもろう`);
+        // ステージ名表示（難易度なし）
+        this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
         
-        this.showMessage(`レベル ${this.gameState.stage}: ${fullStageName}をまもろう`, 2000, () => {
+        // 難易度表示更新
+        this.difficultyText.setText(difficultyLabel);
+        this.difficultyText.setFill(difficultyColor);
+        
+        this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
             this.startFadeTransition();
         });
     }
@@ -668,8 +671,9 @@ class GameScene extends Phaser.Scene {
             this.frameCounterText.setVisible(false);
         }
         
-        if (this.gameState.stage > this.gameState.maxStages) {
-            // 全ステージクリア
+        // 5ステージごとにエンディング画面に遷移
+        if (this.gameState.stage > this.gameState.maxStages && (this.gameState.stage - 1) % 5 === 0) {
+            // 5の倍数ステージクリア時のエンディング
             this.scene.start('EndingScene', { score: this.gameState.score });
         } else {
             this.signalText.setVisible(false);
@@ -748,7 +752,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.15', {
+        this.add.text(20, 20, 'v1.0.17', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
