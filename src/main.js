@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.17', {
+        this.add.text(20, 20, 'v1.0.18', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -129,7 +129,7 @@ class GameScene extends Phaser.Scene {
         super({ key: 'GameScene' });
         this.gameState = {
             stage: 1,
-            score: 0,
+            score: 0, // デフォルト値
             itAssetState: 'normal',
             playerState: 'normal',
             enemyState: 'normal',
@@ -137,6 +137,17 @@ class GameScene extends Phaser.Scene {
             isWaiting: false, // シグナル待機中フラグ
             maxStages: 5
         };
+    }
+
+    init(data) {
+        // リトライ時のスコア復元（コンストラクタの後に実行される）
+        if (data && data.preserveScore !== undefined) {
+            this.gameState.score = data.preserveScore;
+            console.log('Score restored:', this.gameState.score); // デバッグ用
+        } else {
+            // 新規ゲーム開始時はスコアを0にリセット
+            this.gameState.score = 0;
+        }
     }
 
     create() {
@@ -147,13 +158,6 @@ class GameScene extends Phaser.Scene {
         this.setupCharacters();
         this.setupInput();
         this.startStage();
-    }
-
-    init(data) {
-        // リトライ時のスコア復元
-        if (data && data.preserveScore !== undefined) {
-            this.gameState.score = data.preserveScore;
-        }
     }
 
     update() {
@@ -167,7 +171,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.17', {
+        this.versionText = this.add.text(20, 20, 'v1.0.18', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -566,7 +570,10 @@ class GameScene extends Phaser.Scene {
                 }
                 
                 this.showMessage(reactionMessage, 1000, () => {
+                    // スコア加算処理
+                    const oldScore = this.gameState.score;
                     this.gameState.score++;
+                    console.log('Score updated:', oldScore, '->', this.gameState.score); // デバッグ用
                     this.scoreText.setText(`まもった: ${this.gameState.score}`);
                     
                     this.time.delayedCall(500, () => {
@@ -752,7 +759,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.17', {
+        this.add.text(20, 20, 'v1.0.18', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
