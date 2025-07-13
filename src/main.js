@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.11', {
+        this.add.text(20, 20, 'v1.0.12', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.11', {
+        this.versionText = this.add.text(20, 20, 'v1.0.12', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -237,8 +237,23 @@ class GameScene extends Phaser.Scene {
         const itAssets = ['pcNormal', 'pcNormal', 'cloudNormal', 'aiNormal', 'aiNormal'];
         const threats = ['malwareNormal', 'malwareNormal', 'systemErrorNormal', 'systemErrorNormal', 'malwareNormal'];
         
-        const currentItAsset = itAssets[this.gameState.stage - 1] || 'pcNormal';
-        const currentThreat = threats[this.gameState.stage - 1] || 'malwareNormal';
+        let currentItAsset, currentThreat;
+        
+        if (this.gameState.stage <= 5) {
+            // ステージ1-5: 定義済みアセット
+            currentItAsset = itAssets[this.gameState.stage - 1] || 'pcNormal';
+            currentThreat = threats[this.gameState.stage - 1] || 'malwareNormal';
+        } else {
+            // ステージ6以降: 無限モード（サイクル）
+            const infiniteItAssets = ['aiNormal', 'cloudNormal', 'pcNormal'];
+            const infiniteThreats = ['systemErrorNormal', 'malwareNormal'];
+            
+            const itIndex = (this.gameState.stage - 6) % infiniteItAssets.length;
+            const threatIndex = (this.gameState.stage - 6) % infiniteThreats.length;
+            
+            currentItAsset = infiniteItAssets[itIndex];
+            currentThreat = infiniteThreats[threatIndex];
+        }
 
         // 既存のスプライトを削除して新しいものを作成
         if (this.itAsset) this.itAsset.destroy();
@@ -275,7 +290,16 @@ class GameScene extends Phaser.Scene {
 
     showStageInfo() {
         const stageNames = ['PC(ピーシー)', 'サーバー', 'クラウド', 'AI(エーアイ)', 'ネットワーク'];
-        const stageName = stageNames[this.gameState.stage - 1] || 'IT';
+        let stageName;
+        
+        if (this.gameState.stage <= 5) {
+            stageName = stageNames[this.gameState.stage - 1] || 'IT';
+        } else {
+            // ステージ6以降: 無限モード表示
+            const infiniteNames = ['スーパーPC', '量子コンピューター', 'メタバース', '次世代AI', 'サイバー宇宙'];
+            const infiniteIndex = (this.gameState.stage - 6) % infiniteNames.length;
+            stageName = infiniteNames[infiniteIndex];
+        }
         
         this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
         
@@ -397,8 +421,15 @@ class GameScene extends Phaser.Scene {
         
         this.gameState.isGameActive = true;
         
-        // ステージに応じた制限時間
-        const timeLimit = Math.max(1000, 3000 - (this.gameState.stage * 300));
+        // ステージに応じた制限時間（段階的に難易度上昇）
+        let timeLimit;
+        if (this.gameState.stage <= 5) {
+            // ステージ1-5: 基本的な難易度上昇
+            timeLimit = Math.max(1000, 3000 - (this.gameState.stage * 300));
+        } else {
+            // ステージ6以降: 無限モード（さらに難しく）
+            timeLimit = Math.max(500, 1000 - ((this.gameState.stage - 5) * 100));
+        }
         
         this.defenseTimer = this.time.delayedCall(timeLimit, () => {
             if (this.gameState.isGameActive) {
@@ -692,7 +723,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.11', {
+        this.add.text(20, 20, 'v1.0.12', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
