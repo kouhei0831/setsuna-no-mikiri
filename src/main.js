@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.2', {
+        this.add.text(20, 20, 'v1.0.3', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -134,6 +134,7 @@ class GameScene extends Phaser.Scene {
             playerState: 'normal',
             enemyState: 'normal',
             isGameActive: false,
+            isWaiting: false, // シグナル待機中フラグ
             maxStages: 5
         };
     }
@@ -159,7 +160,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.2', {
+        this.versionText = this.add.text(20, 20, 'v1.0.3', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -283,6 +284,8 @@ class GameScene extends Phaser.Scene {
         this.gameState.itAssetState = 'normal';
         this.gameState.playerState = 'normal';
         this.gameState.enemyState = 'normal';
+        this.gameState.isWaiting = false;
+        this.gameState.isGameActive = false;
         
         this.updateCharacterSprites();
     }
@@ -293,6 +296,9 @@ class GameScene extends Phaser.Scene {
     }
 
     showBuildupSequence() {
+        // 待機状態開始（お手付き検出開始）
+        this.gameState.isWaiting = true;
+        
         // 背景を徐々に危険な色に変化させる
         const dangerOverlay = this.add.rectangle(400, 300, 800, 600, 0x000000, 0);
         
@@ -331,6 +337,9 @@ class GameScene extends Phaser.Scene {
     }
 
     showWarningSignal() {
+        // 待機状態終了
+        this.gameState.isWaiting = false;
+        
         // 警告シグナル表示
         this.signalButton.setTexture('signalActive').setVisible(true);
         this.showMessage('あぶない！まもって！', 0);
@@ -353,6 +362,12 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseInput() {
+        // お手付きチェック（シグナル表示前のクリック）
+        if (this.gameState.isWaiting) {
+            this.onEarlyClick();
+            return;
+        }
+        
         if (!this.gameState.isGameActive) return;
         
         this.gameState.isGameActive = false;
@@ -364,6 +379,22 @@ class GameScene extends Phaser.Scene {
         const reactionFrames = this.frameCounter;
         
         this.onDefenseSuccess(reactionFrames);
+    }
+
+    onEarlyClick() {
+        // お手付き処理（待機状態を停止）
+        this.gameState.isWaiting = false;
+        
+        // 進行中のタイマーを全て停止
+        this.time.removeAllEvents();
+        
+        // シグナルを赤色（エラー）に変更
+        this.signalButton.setTexture('signalError').setVisible(true);
+        
+        this.showMessage('はやすぎ！おてつき！', 1500, () => {
+            // ミス一回と同じ処理
+            this.onDefenseFail();
+        });
     }
 
     onDefenseSuccess(reactionFrames) {
@@ -554,7 +585,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.2', {
+        this.add.text(20, 20, 'v1.0.3', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
