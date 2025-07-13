@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.12', {
+        this.add.text(20, 20, 'v1.0.13', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.12', {
+        this.versionText = this.add.text(20, 20, 'v1.0.13', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -295,10 +295,8 @@ class GameScene extends Phaser.Scene {
         if (this.gameState.stage <= 5) {
             stageName = stageNames[this.gameState.stage - 1] || 'IT';
         } else {
-            // ステージ6以降: 無限モード表示
-            const infiniteNames = ['スーパーPC', '量子コンピューター', 'メタバース', '次世代AI', 'サイバー宇宙'];
-            const infiniteIndex = (this.gameState.stage - 6) % infiniteNames.length;
-            stageName = infiniteNames[infiniteIndex];
+            // ステージ6以降: シンプルにIT表記
+            stageName = 'IT';
         }
         
         this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
@@ -427,8 +425,11 @@ class GameScene extends Phaser.Scene {
             // ステージ1-5: 基本的な難易度上昇
             timeLimit = Math.max(1000, 3000 - (this.gameState.stage * 300));
         } else {
-            // ステージ6以降: 無限モード（さらに難しく）
-            timeLimit = Math.max(500, 1000 - ((this.gameState.stage - 5) * 100));
+            // ステージ6以降: 無限モード（非常に難しく）
+            // レベル10で約11フレーム（183ms）を目標とする
+            const baseDifficulty = 1000; // 1秒スタート
+            const stageAfter5 = this.gameState.stage - 5;
+            timeLimit = Math.max(183, baseDifficulty - (stageAfter5 * 163));
         }
         
         this.defenseTimer = this.time.delayedCall(timeLimit, () => {
@@ -723,7 +724,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.12', {
+        this.add.text(20, 20, 'v1.0.13', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
