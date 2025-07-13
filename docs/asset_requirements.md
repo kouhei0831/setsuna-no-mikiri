@@ -2,6 +2,11 @@
 
 ## ゲーム仕様変更履歴
 
+### v1.1.2の変更点
+- **プレイヤーアセット**: 攻撃を受け止めている絵を追加
+- **ゲームプレイ**: より視覚的に防御アクションを表現
+- **ガードポーズ強化**: 防御時のスケールを大きく（0.4倍）、表示時間も延長してステージクリアまで維持
+
 ### v1.0.9の変更点（一時的実装）
 - **シグナル表示**: ボタン画像からテキストベースのシンボル表示に変更（**暫定措置**）
   - 危険時: 大きな赤い ⚠ マーク（点滅あり）
@@ -23,9 +28,15 @@
   - デザイン: 狐っぽい生き物、DXC紫色、シールドを持っている
   - 表情: 信頼できる守護者の顔（目と口）
 
+- **player_character_defending.png** (64x64px)
+  - 用途: プレイヤーキャラクター - 攻撃を受け止めている状態
+  - デザイン: シールドを前面に構えて攻撃を防いでいる、防御ポーズ
+  - 表情: 集中して攻撃を受け止めている勇敢な表情
+
 - **player_character_damaged.png** (64x64px)
   - 用### バージョン履歴
 
+- **v1.1.2**: プレイヤーキャラクター防御アセット追加（player_character_defending.png）
 - **v1.1.1**: 防衛対象（IT資産）の表示を削除、プレイヤーキャラクターのサイズ・位置調整、ファイル名をplayer_character_normal.pngに統一
 - **v1.1.0**: プレイヤーキャラクターを新しいPNG画像に置き換え、スケール・位置調整イヤーキャラクター - 被ダメージ状態
   - デザイン: 少し困った表情、シールドが少し傷ついている
@@ -272,13 +283,14 @@
 **注意**: v1.0.9では一時的にテキストシンボル（⚠、✓、✕）を使用していますが、コードでは上記のSVGファイルを参照しています。シグナル表示は本ゲームの**コア機能**です。
 
 ### 高優先度（見栄えに重要）
-1. **player_character_normal.png** - プレイヤーキャラクター（使用中）
-2. **threat_malware_normal.svg** - マルウェア脅威（使用中）
-3. **threat_system_error_normal.svg** - システム障害脅威（使用中）
-4. start_button.png
-5. retry_button.png
-6. background_menu.png
-7. button_click.mp3
+1. **player_character_normal.png** - プレイヤーキャラクター通常時（使用中）
+2. **player_character_defending.png** - プレイヤーキャラクター防御時（新規追加）
+3. **threat_malware_normal.svg** - マルウェア脅威（使用中）
+4. **threat_system_error_normal.svg** - システム障害脅威（使用中）
+5. start_button.png
+6. retry_button.png
+7. background_menu.png
+8. button_click.mp3
 
 ### 中優先度（あると良い）
 1. player_character_damaged.png（プレイヤーダメージ状態）
@@ -309,6 +321,14 @@
 
 ```
 assets/
+├── gen/
+│   └── images/
+│       ├── player_character_normal.png（使用中・主人公通常時）
+│       ├── player_character_defending.png（新規追加・主人公防御時）
+│       ├── player_character_damaged.png（未使用・主人公被ダメージ）
+│       ├── player_character_victory.png（未使用・主人公勝利時）
+│       ├── player_character_ko.png（未使用・主人公KO時）
+│       └── game_background_cyber.png（使用中・ゲーム背景）
 ├── images/
 │   ├── signals/
 │   │   ├── signal_danger.svg（最重要・危険シグナル）
@@ -316,22 +336,22 @@ assets/
 │   │   ├── signal_success.svg（成功表示）
 │   │   └── signal_error.svg（失敗・エラー表示）
 │   ├── buttons/
-│   │   ├── start_button.svg
-│   │   └── retry_button.svg
+│   │   ├── start_button.svg（使用中）
+│   │   └── retry_button.svg（使用中）
 │   ├── characters/
-│   │   ├── player_character.svg
-│   │   ├── player_character_damaged.svg
-│   │   ├── player_character_victory.svg
-│   │   └── player_character_ko.svg
-│   ├── protected_assets/
-│   │   ├── protected_pc_normal.svg
-│   │   ├── protected_cloud_normal.svg
-│   │   └── protected_ai_normal.svg
+│   │   └── （SVGキャラクターアセット・未使用）
 │   ├── threats/
-│   │   ├── threat_malware_normal.svg
-│   │   └── threat_system_error_normal.svg
+│   │   ├── threat_malware_normal.svg（使用中）
+│   │   ├── threat_system_error_normal.svg（使用中）
+│   │   ├── threat_malware_damaged.svg（未使用）
+│   │   ├── threat_malware_ko.svg（未使用）
+│   │   ├── threat_system_error_damaged.svg（未使用）
+│   │   └── threat_system_error_ko.svg（未使用）
 │   ├── backgrounds/
-│   │   └── background_menu.svg
+│   │   ├── background_menu.svg（使用中）
+│   │   └── background_game.svg（未使用）
+│   ├── protected_assets/
+│   │   └── （削除済み・v1.1.1で防衛対象表示を廃止）
 │   └── unused_assets/
 │       ├── character_large.svg
 │       ├── character_medium.svg
@@ -346,6 +366,12 @@ assets/
 └── sounds/
     └── (現在は空フォルダ)
 ```
+
+**重要な変更点（v1.1.2）:**
+- **`assets/gen/images/`**: 最終的なPNG画像アセットの格納場所
+- **`player_character_defending.png`**: 新規追加の防御ポーズアセット
+- **実装状況**: 使用中/未使用の状態を明記
+- **SVGアセット**: `assets/images/`に従来通り配置（ボタン、脅威、背景など）
 
 **注意**: 現在の実装は**SVG形式**を使用しており、v1.0.9では`signal_*.svg`ファイルがコードで参照されていますが、実際にはテキストシンボル（⚠、✓、✕）でレンダリングされています。
 

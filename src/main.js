@@ -35,8 +35,9 @@ class PreloadScene extends Phaser.Scene {
         this.load.svg('signalSuccess', 'assets/images/signal_success.svg', { width: 120, height: 120 });
         this.load.svg('signalError', 'assets/images/signal_error.svg', { width: 120, height: 120 });
         
-        // プレイヤーキャラクター（全て同じ画像を使用）
+        // プレイヤーキャラクター
         this.load.image('heroNormal', 'assets/gen/images/player_character_normal.png');
+        this.load.image('heroDefending', 'assets/gen/images/player_character_defending.png');
         this.load.image('heroDamaged', 'assets/gen/images/player_character_normal.png');
         this.load.image('heroVictory', 'assets/gen/images/player_character_normal.png');
         this.load.image('heroKo', 'assets/gen/images/player_character_normal.png');
@@ -69,7 +70,7 @@ class MenuScene extends Phaser.Scene {
         this.add.image(640, 360, 'menuBackground').setScale(1.6);
 
         // バージョン表示（背景の後に配置して最前面に）
-        this.add.text(20, 20, 'v1.1.1', {
+        this.add.text(20, 20, 'v1.1.2', {
             fontSize: '18px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -263,6 +264,16 @@ class GameScene extends Phaser.Scene {
 
         // 敵キャラクター
         this.enemy = this.add.image(1030, 360, currentThreat).setOrigin(0.5).setDepth(100);
+    }
+
+    updateEnemyState() {
+        // 敵の状態のみ更新（プレイヤーキャラクターは変更しない）
+        if (this.gameState.enemyState === 'ko') {
+            // 敵を非表示にするか、KO状態のテクスチャに変更
+            if (this.enemy) {
+                this.enemy.setVisible(false);
+            }
+        }
     }
 
     setupInput() {
@@ -530,6 +541,10 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseSuccess(reactionFrames) {
+        // 即座にガードポーズに切り替え（画面揺れと同時）
+        this.gameState.playerState = 'defending';
+        this.updateCharacterSprites();
+        
         // クリック時の画面揺らしエフェクト
         this.cameras.main.shake(400, 0.02);
         
@@ -550,13 +565,12 @@ class GameScene extends Phaser.Scene {
         // シールドエフェクト
         this.showShieldEffect();
         
-        this.time.delayedCall(500, () => {
-            // キャラクター状態更新
+        this.time.delayedCall(800, () => {
+            // 敵の状態のみ更新（プレイヤーはガードポーズを維持）
             this.gameState.enemyState = 'ko';
-            this.gameState.playerState = 'victory';
-            this.updateCharacterSprites();
+            this.updateEnemyState(); // 敵のみ更新
             
-            this.time.delayedCall(500, () => {
+            this.time.delayedCall(700, () => {
                 // リアクションタイム評価
                 let reactionMessage = 'まもった！';
                 if (reactionFrames <= 30) { // 0.5秒以内
@@ -565,15 +579,18 @@ class GameScene extends Phaser.Scene {
                     reactionMessage = 'いいタイミング！まもった！';
                 }
                 
-                this.showMessage(reactionMessage, 1000, () => {
+                this.showMessage(reactionMessage, 1200, () => {
                     // スコア加算処理
                     const oldScore = this.gameState.score;
                     this.gameState.score++;
                     console.log('Score updated:', oldScore, '->', this.gameState.score); // デバッグ用
                     this.scoreText.setText(`まもった: ${this.gameState.score}`);
                     
-                    this.time.delayedCall(500, () => {
-                        this.showMessage('ステージクリア！', 1000, () => {
+                    this.time.delayedCall(600, () => {
+                        this.showMessage('ステージクリア！', 1200, () => {
+                            // ステージクリア時に通常状態に戻してから次ステージへ
+                            this.gameState.playerState = 'normal';
+                            this.updateCharacterSprites();
                             this.nextStage();
                         });
                     });
@@ -655,15 +672,17 @@ class GameScene extends Phaser.Scene {
     }
 
     updateCharacterSprites() {
-        // プレイヤー状態に応じてスプライト更新（全て同じ画像を使用）
-        if (this.gameState.playerState === 'damaged') {
-            this.player.setTexture('heroDamaged');
+        // プレイヤー状態に応じてスプライト更新
+        if (this.gameState.playerState === 'defending') {
+            this.player.setTexture('heroDefending').setScale(0.4); // 防御時は少し大きく
+        } else if (this.gameState.playerState === 'damaged') {
+            this.player.setTexture('heroDamaged').setScale(0.3);
         } else if (this.gameState.playerState === 'victory') {
-            this.player.setTexture('heroVictory');
+            this.player.setTexture('heroVictory').setScale(0.3);
         } else if (this.gameState.playerState === 'ko') {
-            this.player.setTexture('heroKo');
+            this.player.setTexture('heroKo').setScale(0.3);
         } else {
-            this.player.setTexture('heroNormal');
+            this.player.setTexture('heroNormal').setScale(0.3);
         }
     }
 
