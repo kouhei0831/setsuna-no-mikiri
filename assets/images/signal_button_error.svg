@@ -1,0 +1,54 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- エラー状態のシグナルボタン - 赤色ベース、警告感を表現 -->
+  <defs>
+    <radialGradient id="errorGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#F87171"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </radialGradient>
+    <filter id="errorPulse">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- 警告の赤いオーラ -->
+  <circle cx="60" cy="60" r="65" fill="#EF4444" opacity="0.2">
+    <animate attributeName="opacity" values="0.1;0.3;0.1" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- 外側の境界線 -->
+  <circle cx="60" cy="60" r="58" fill="#FFFFFF" stroke="#EF4444" stroke-width="3" filter="url(#shadow)"/>
+  
+  <!-- メインボタン -->
+  <circle cx="60" cy="60" r="50" fill="url(#errorGradient)" filter="url(#errorPulse)"/>
+  
+  <!-- 警告の三角形 -->
+  <path d="M60,30 L80,70 L40,70 Z" 
+        fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.8"/>
+  
+  <!-- エクスクラメーションマーク -->
+  <line x1="60" y1="45" x2="60" y2="60" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="60" cy="67" r="3" fill="#FFFFFF"/>
+  
+  <!-- エラーのスパークエフェクト -->
+  <g opacity="0.6">
+    <line x1="35" y1="35" x2="40" y2="30" stroke="#FFFFFF" stroke-width="2">
+      <animate attributeName="opacity" values="0;1;0" dur="0.8s" repeatCount="indefinite"/>
+    </line>
+    <line x1="85" y1="35" x2="80" y2="30" stroke="#FFFFFF" stroke-width="2">
+      <animate attributeName="opacity" values="0;1;0" dur="1.2s" repeatCount="indefinite"/>
+    </line>
+    <line x1="35" y1="85" x2="40" y2="90" stroke="#FFFFFF" stroke-width="2">
+      <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
+    </line>
+    <line x1="85" y1="85" x2="80" y2="90" stroke="#FFFFFF" stroke-width="2">
+      <animate attributeName="opacity" values="0;1;0" dur="0.9s" repeatCount="indefinite"/>
+    </line>
+  </g>
+</svg>

@@ -1,0 +1,77 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- 守るべきクラウド - 通常状態 -->
+  <defs>
+    <linearGradient id="cloudGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E5E7EB"/>
+    </linearGradient>
+    <radialGradient id="dataGlow" cx="50%" cy="50%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- メインクラウド形状 -->
+  <path d="M20,40 Q15,35 20,30 Q25,25 32,30 Q40,20 50,30 Q55,25 58,30 Q60,35 55,40 Q58,45 50,45 Q45,50 32,45 Q25,50 20,40 Z" 
+        fill="url(#cloudGradient)" stroke="#D1D5DB" stroke-width="1" filter="url(#glow)"/>
+  
+  <!-- 安全を示すキラキラエフェクト -->
+  <circle cx="32" cy="35" r="12" fill="url(#dataGlow)" opacity="0.3">
+    <animate attributeName="opacity" values="0.2;0.4;0.2" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- データが安全に浮遊している様子 -->
+  <g fill="url(#dataGlow)" opacity="0.8">
+    <circle cx="28" cy="32" r="2">
+      <animate attributeName="cy" values="30;34;30" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="36" cy="35" r="2">
+      <animate attributeName="cy" values="33;37;33" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="32" cy="38" r="2">
+      <animate attributeName="cy" values="36;40;36" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- データ接続線 -->
+  <g stroke="url(#dataGlow)" stroke-width="1" opacity="0.6" fill="none">
+    <path d="M28,32 Q30,30 32,32">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M32,35 Q34,33 36,35">
+      <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite"/>
+    </path>
+    <path d="M36,35 Q34,37 32,38">
+      <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2.2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- DXCアクセント -->
+  <rect x="25" y="50" width="14" height="3" rx="1" fill="#6B46C1" opacity="0.8"/>
+  <text x="32" y="52.5" text-anchor="middle" fill="#FFFFFF" font-size="4" font-weight="bold">CLOUD</text>
+  
+  <!-- 安全状態を示すアイコン -->
+  <g transform="translate(45, 25)">
+    <circle cx="0" cy="0" r="6" fill="#10B981" opacity="0.9"/>
+    <path d="M-3,0 L-1,2 L3,-2" stroke="#FFFFFF" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 雲の詳細（小さな雲の塊） -->
+  <circle cx="22" cy="38" r="4" fill="#F3F4F6" opacity="0.8"/>
+  <circle cx="50" cy="33" r="3" fill="#F3F4F6" opacity="0.8"/>
+  <circle cx="40" cy="42" r="3" fill="#F3F4F6" opacity="0.8"/>
+  
+  <!-- データセンターとの接続を示す波線 -->
+  <g stroke="#6B46C1" stroke-width="1" opacity="0.4" fill="none">
+    <path d="M32,50 Q30,55 32,60 Q34,55 32,50">
+      <animate attributeName="opacity" values="0.2;0.6;0.2" dur="2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>

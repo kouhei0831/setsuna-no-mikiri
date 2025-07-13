@@ -1,0 +1,83 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <!-- システム障害 - 通常状態 -->
+  <defs>
+    <radialGradient id="errorGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </radialGradient>
+    <filter id="spark">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- 稲妻の主要部分 -->
+  <path d="M24,5 L28,15 L22,15 L26,25 L20,25 L24,35 L18,35 L22,45 L16,45 L20,48" 
+        fill="url(#errorGradient)" stroke="#DC2626" stroke-width="1" filter="url(#spark)"/>
+  
+  <!-- 稲妻の分岐 -->
+  <path d="M22,18 L18,22 L20,22 L16,28" 
+        fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  <path d="M28,20 L32,24 L30,24 L34,30" 
+        fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 電気的なエフェクト -->
+  <g stroke="#FBBF24" stroke-width="1" fill="none" opacity="0.8">
+    <path d="M12,15 L16,12">
+      <animate attributeName="opacity" values="0;1;0" dur="0.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M36,22 L40,19">
+      <animate attributeName="opacity" values="0;1;0" dur="0.7s" repeatCount="indefinite"/>
+    </path>
+    <path d="M10,35 L14,32">
+      <animate attributeName="opacity" values="0;1;0" dur="0.6s" repeatCount="indefinite"/>
+    </path>
+    <path d="M38,38 L42,35">
+      <animate attributeName="opacity" values="0;1;0" dur="0.8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- 火花エフェクト -->
+  <g fill="#FBBF24" opacity="0.9">
+    <circle cx="18" cy="22" r="1">
+      <animate attributeName="r" values="0.5;2;0.5" dur="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="32" cy="24" r="1">
+      <animate attributeName="r" values="0.5;2;0.5" dur="0.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.7;1;0.7" dur="0.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="22" cy="45" r="1">
+      <animate attributeName="r" values="1;3;1" dur="0.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="0.5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 危険のオーラ -->
+  <circle cx="24" cy="24" r="20" fill="none" stroke="#F59E0B" stroke-width="1" opacity="0.3">
+    <animate attributeName="r" values="18;22;18" dur="1.5s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.2;0.4;0.2" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- システムクラッシュを表現する破片 -->
+  <g fill="#DC2626" opacity="0.6">
+    <rect x="8" y="12" width="2" height="2" transform="rotate(45 9 13)">
+      <animateTransform attributeName="transform" type="rotate" values="0 9 13;360 9 13" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="38" y="8" width="2" height="2" transform="rotate(45 39 9)">
+      <animateTransform attributeName="transform" type="rotate" values="0 39 9;-360 39 9" dur="1.5s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="6" y="38" width="2" height="2" transform="rotate(45 7 39)">
+      <animateTransform attributeName="transform" type="rotate" values="0 7 39;360 7 39" dur="1.8s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- 警告マーク -->
+  <g transform="translate(24, 10)">
+    <path d="M0,-4 L3,2 L-3,2 Z" fill="#DC2626" opacity="0.8"/>
+    <text x="0" y="0" text-anchor="middle" fill="#FFFFFF" font-size="4" font-weight="bold">!</text>
+  </g>
+</svg>

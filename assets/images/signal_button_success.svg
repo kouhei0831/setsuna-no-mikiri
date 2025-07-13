@@ -1,0 +1,43 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- 成功状態のシグナルボタン - 緑色ベース、シールドエフェクト付き -->
+  <defs>
+    <radialGradient id="successGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </radialGradient>
+    <filter id="successGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- 外側の境界線 -->
+  <circle cx="60" cy="60" r="58" fill="#FFFFFF" stroke="#10B981" stroke-width="3" filter="url(#shadow)"/>
+  
+  <!-- メインボタン -->
+  <circle cx="60" cy="60" r="50" fill="url(#successGradient)" filter="url(#successGlow)"/>
+  
+  <!-- シールドの形 -->
+  <path d="M60,25 L75,35 L75,55 L60,70 L45,55 L45,35 Z" 
+        fill="none" stroke="#FFFFFF" stroke-width="3" opacity="0.8"/>
+  
+  <!-- チェックマーク -->
+  <path d="M50,55 L57,62 L70,45" 
+        fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- 成功のキラキラエフェクト -->
+  <g opacity="0.7">
+    <path d="M40,40 L42,35 L44,40 L49,38 L47,43 L44,48 L42,43 L37,45 Z" fill="#FFFFFF">
+      <animateTransform attributeName="transform" type="rotate" values="0 42 41;360 42 41" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M75,50 L77,45 L79,50 L84,48 L82,53 L79,58 L77,53 L72,55 Z" fill="#FFFFFF">
+      <animateTransform attributeName="transform" type="rotate" values="0 77 51;360 77 51" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+  </g>
+</svg>
