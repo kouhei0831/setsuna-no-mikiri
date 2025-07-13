@@ -65,6 +65,15 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        // バージョン表示（デバッグ用）
+        this.add.text(20, 20, 'v1.0.1', {
+            fontSize: '14px',
+            fill: '#888888',
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 4, y: 2 }
+        }).setOrigin(0, 0);
+
         // 背景
         this.add.image(400, 300, 'menuBackground');
 
@@ -149,6 +158,15 @@ class GameScene extends Phaser.Scene {
     }
 
     setupUI() {
+        // バージョン表示（デバッグ用）
+        this.versionText = this.add.text(20, 20, 'v1.0.1', {
+            fontSize: '14px',
+            fill: '#888888',
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 4, y: 2 }
+        }).setOrigin(0, 0);
+
         // ステージ表示
         this.stageText = this.add.text(400, 50, '', {
             fontSize: '28px',
@@ -529,6 +547,15 @@ class EndingScene extends Phaser.Scene {
     }
 
     create() {
+        // バージョン表示（デバッグ用）
+        this.add.text(20, 20, 'v1.0.1', {
+            fontSize: '14px',
+            fill: '#888888',
+            fontFamily: 'Arial',
+            backgroundColor: '#000000',
+            padding: { x: 4, y: 2 }
+        }).setOrigin(0, 0);
+
         // 背景
         this.add.rectangle(400, 300, 800, 600, 0x6B46C1);
 
