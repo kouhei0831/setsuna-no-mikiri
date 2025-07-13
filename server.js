@@ -18,6 +18,11 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
+    // Enhanced access log
+    const timestamp = new Date().toISOString();
+    const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress;
+    console.log(`[${timestamp}] ${req.method} ${req.url} from ${clientIP} - ${req.headers['user-agent'] || 'Unknown'}`);
+    
     // CORS headers for cross-origin access
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
