@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.10', {
+        this.add.text(20, 20, 'v1.0.11', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.10', {
+        this.versionText = this.add.text(20, 20, 'v1.0.11', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -432,6 +432,11 @@ class GameScene extends Phaser.Scene {
         this.gameState.isWaiting = false;
         this.gameState.isGameActive = false;
         
+        // フレームカウンター非表示
+        if (this.frameCounterText) {
+            this.frameCounterText.setVisible(false);
+        }
+        
         // 進行中のタイマーとトゥイーンを全て停止
         this.time.removeAllEvents();
         this.tweens.killAll();
@@ -517,6 +522,11 @@ class GameScene extends Phaser.Scene {
 
     onDefenseFail() {
         this.gameState.isGameActive = false;
+        
+        // フレームカウンター非表示
+        if (this.frameCounterText) {
+            this.frameCounterText.setVisible(false);
+        }
         
         // 失敗時のシグナル表示
         this.signalText.setText('✕')
@@ -682,7 +692,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.10', {
+        this.add.text(20, 20, 'v1.0.11', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
