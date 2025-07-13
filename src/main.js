@@ -66,7 +66,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.8', {
+        this.add.text(20, 20, 'v1.0.9', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -167,7 +167,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // バージョン表示（デバッグ用）
-        this.versionText = this.add.text(20, 20, 'v1.0.8', {
+        this.versionText = this.add.text(20, 20, 'v1.0.9', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',
@@ -198,10 +198,17 @@ class GameScene extends Phaser.Scene {
             fontWeight: 'bold'
         }).setOrigin(0.5);
 
-        // シグナルボタン
-        this.signalButton = this.add.image(400, 400, 'signalNormal')
-            .setOrigin(0.5)
-            .setVisible(false);
+        // シグナル表示（画面上部）
+        this.signalText = this.add.text(400, 100, '', {
+            fontSize: '48px',
+            fill: '#FF0000',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            stroke: '#FFFFFF',
+            strokeThickness: 3,
+            backgroundColor: '#000000',
+            padding: { x: 20, y: 10 }
+        }).setOrigin(0.5).setVisible(false);
 
         // フレーム数表示（デジタル時計風）
         this.frameCounter = 0;
@@ -352,8 +359,20 @@ class GameScene extends Phaser.Scene {
         // 待機状態終了
         this.gameState.isWaiting = false;
         
-        // 警告シグナル表示
-        this.signalButton.setTexture('signalActive').setVisible(true);
+        // 警告シグナル表示（画面上部に大きく表示）
+        this.signalText.setText('⚠️ 危険！クリックして防御！ ⚠️')
+            .setFill('#FF0000')
+            .setVisible(true);
+        
+        // シグナルの点滅エフェクト
+        this.tweens.add({
+            targets: this.signalText,
+            alpha: { from: 1, to: 0.3 },
+            duration: 200,
+            yoyo: true,
+            repeat: -1
+        });
+        
         this.showMessage('あぶない！まもって！', 0);
         
         // フレームカウンター初期化・表示開始
@@ -409,19 +428,30 @@ class GameScene extends Phaser.Scene {
             }
         });
         
-        // シグナルを赤色（エラー）に変更
-        this.signalButton.setTexture('signalError').setVisible(true);
+        // シグナルをエラー表示に変更
+        this.signalText.setText('❌ まだだよ！落ち着いて！ ❌')
+            .setFill('#FF4444')
+            .setVisible(true);
+        
+        // 点滅停止
+        this.tweens.killTweensOf(this.signalText);
+        this.signalText.setAlpha(1);
         
         this.showMessage('まだだよ！おちついて！', 1500, () => {
             // シグナルを非表示にしてからミス処理
-            this.signalButton.setVisible(false);
+            this.signalText.setVisible(false);
             this.onDefenseFail();
         });
     }
 
     onDefenseSuccess(reactionFrames) {
         // 成功時の処理
-        this.signalButton.setTexture('signalSuccess');
+        this.signalText.setText('✅ 成功！守った！ ✅')
+            .setFill('#00FF00');
+        
+        // 点滅停止
+        this.tweens.killTweensOf(this.signalText);
+        this.signalText.setAlpha(1);
         
         // シールドエフェクト
         this.showShieldEffect();
@@ -458,7 +488,14 @@ class GameScene extends Phaser.Scene {
 
     onDefenseFail() {
         this.gameState.isGameActive = false;
-        this.signalButton.setTexture('signalError');
+        
+        // 失敗時のシグナル表示
+        this.signalText.setText('💥 失敗！やられた！ 💥')
+            .setFill('#FF0000');
+        
+        // 点滅停止
+        this.tweens.killTweensOf(this.signalText);
+        this.signalText.setAlpha(1);
         
         if (this.gameState.itAssetState === 'normal') {
             // 1回目の失敗
@@ -534,7 +571,8 @@ class GameScene extends Phaser.Scene {
             // 全ステージクリア
             this.scene.start('EndingScene', { score: this.gameState.score });
         } else {
-            this.signalButton.setVisible(false);
+            this.signalText.setVisible(false);
+            this.tweens.killTweensOf(this.signalText);
             this.messageText.setText('');
             this.updateStageAssets(); // 新しいステージのアセットを設定
             this.startStage();
@@ -608,7 +646,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // バージョン表示（デバッグ用）
-        this.add.text(20, 20, 'v1.0.8', {
+        this.add.text(20, 20, 'v1.0.9', {
             fontSize: '14px',
             fill: '#888888',
             fontFamily: 'Arial',

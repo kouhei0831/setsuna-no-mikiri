@@ -2,7 +2,6 @@
   "name": "setsuna-no-mikiri",
   "version": "1.0.0",
   "description": "DXC Technology Family Day 2025 - Setsuna no Mikiri Game",
-  "type": "module",
   "main": "src/main.js",
   "scripts": {
     "start": "npx http-server . -p 8080 -o",
