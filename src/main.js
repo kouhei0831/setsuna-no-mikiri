@@ -908,7 +908,6 @@ class GameScene extends Phaser.Scene {
             fontFamily: 'Arial',
             fontWeight: 'bold'
         }).setOrigin(0.5);
-            });
     }
 
     restartCurrentStage() {
