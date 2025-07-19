@@ -4,6 +4,29 @@
 
 [English version here](./CLAUDE.md)
 
+## 許可された操作
+
+Claude Codeは以下の操作を実行する権限があります：
+
+1. **Edit**: ファイル編集操作（容易に取り消し可能）
+   - ファイル内容の変更
+   - コードの追加、更新、削除
+   - 設定ファイルの編集
+   - ドキュメントの更新
+
+2. **Bash(git commit:*)**: Git コミット操作
+   - `git add` でファイルをステージング
+   - `git commit` でコミット作成
+   - `git push` でリモートリポジトリにプッシュ
+   - `git status`, `git diff`, `git log` でリポジトリ状態確認
+
+3. **Bash(npm run:*)**: NPM スクリプト実行
+   - `npm run build` でプロジェクトビルド
+   - `npm run test` でテスト実行
+   - `npm run start` で開発サーバー起動
+   - `npm run lint` でコードリント
+   - package.jsonで定義されたその他のスクリプト
+
 ## プロジェクト概要
 
 **刹那の見切り (Setsuna no Mikiri)** - DXCテクノロジーのファミリーデー2025イベント用の防御アクションミニゲーム。プレイヤーは素早い反射神経でDXCのIT資産を脅威から守ります。

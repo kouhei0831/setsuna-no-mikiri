@@ -4,6 +4,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 [日本語版はこちら](./CLAUDE.ja.md)
 
+## Authorized Operations
+
+Claude Code is authorized to perform the following operations:
+
+1. **Edit**: File editing operations (easily reversible)
+   - Modify file contents
+   - Add, update, or delete code
+   - Edit configuration files
+   - Update documentation
+
+2. **Bash(git commit:*)**: Git commit operations
+   - `git add` to stage files
+   - `git commit` to create commits
+   - `git push` to push to remote repository
+   - `git status`, `git diff`, `git log` for checking repository state
+
+3. **Bash(npm run:*)**: NPM script execution
+   - `npm run build` for building the project
+   - `npm run test` for running tests
+   - `npm run start` for starting development server
+   - `npm run lint` for linting code
+   - Other scripts defined in package.json
+
 ## Project Overview
 
 **刹那の見切り (Setsuna no Mikiri)** - A defensive action mini-game for DXC Technology's Family Day 2025 event. Players protect DXC's IT assets from threats through quick reflexes.

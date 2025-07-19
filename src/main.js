@@ -178,7 +178,7 @@ class GameScene extends Phaser.Scene {
         if (this.gameState.isGameActive && this.frameCounterText && this.frameCounterText.visible) {
             this.frameCounter++;
             const displayFrame = this.frameCounter.toString().padStart(4, '0');
-            this.frameCounterText.setText(`FRAME: ${displayFrame}`);
+            this.frameCounterText.setText(`${displayFrame}`);
         }
     }
 
@@ -455,7 +455,7 @@ class GameScene extends Phaser.Scene {
         // フレームカウンター初期化・表示開始
         this.frameCounter = 0;
         this.frameCounterText.setVisible(true);
-        this.frameCounterText.setText('FRAME: 0000');
+        this.frameCounterText.setText('0000');
         
         this.gameState.isGameActive = true;
         
