@@ -11,7 +11,7 @@ class PreloadScene extends Phaser.Scene {
 
     preload() {
         // 読み込み画面
-        this.add.text(512, 280, 'ロード中...', {
+        this.add.text(960, 420, 'ロード中...', {
             fontSize: '32px',
             fill: '#FFFFFF',
             fontFamily: 'Arial'
@@ -21,12 +21,12 @@ class PreloadScene extends Phaser.Scene {
         const progressBar = this.add.graphics();
         const progressBox = this.add.graphics();
         progressBox.fillStyle(0x222222);
-        progressBox.fillRect(412, 320, 200, 20);
+        progressBox.fillRect(860, 480, 200, 20);
 
         this.load.on('progress', (value) => {
             progressBar.clear();
             progressBar.fillStyle(0x6B46C1);
-            progressBar.fillRect(412, 320, 200 * value, 20);
+            progressBar.fillRect(860, 480, 200 * value, 20);
         });
 
         // SVGアセットをロード
@@ -68,7 +68,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // 背景
-        this.add.image(640, 360, 'menuBackground').setScale(1.6);
+        this.add.image(960, 540, 'menuBackground').setScale(2.4);
 
         // バージョン表示（背景の後に配置して最前面に）
         this.add.text(20, 20, 'v2.0.0', {
@@ -82,7 +82,7 @@ class MenuScene extends Phaser.Scene {
         }).setOrigin(0, 0).setDepth(1000);
 
         // タイトル
-        this.add.text(640, 200, '刹那の見切り【テスト版】', {
+        this.add.text(960, 300, '刹那の見切り【テスト版】', {
             fontSize: '56px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -91,7 +91,7 @@ class MenuScene extends Phaser.Scene {
             strokeThickness: 6
         }).setOrigin(0.5);
 
-        this.add.text(640, 270, 'DXCのIT(アイティー)をまもろう！', {
+        this.add.text(960, 405, 'DXCのIT(アイティー)をまもろう！', {
             fontSize: '28px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -100,7 +100,7 @@ class MenuScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // スタートボタン
-        const startButton = this.add.image(640, 420, 'startButton')
+        const startButton = this.add.image(960, 630, 'startButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -114,7 +114,7 @@ class MenuScene extends Phaser.Scene {
             });
 
         // DXCブランディング
-        this.add.text(640, 600, 'DXC Technology Family Day 2025', {
+        this.add.text(960, 900, 'DXC Technology Family Day 2025', {
             fontSize: '16px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -123,7 +123,7 @@ class MenuScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // 操作説明
-        this.add.text(640, 520, 'タップして IT をまもろう！', {
+        this.add.text(960, 780, 'タップして IT をまもろう！', {
             fontSize: '18px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
@@ -144,6 +144,7 @@ class GameScene extends Phaser.Scene {
             enemyState: 'normal',
             isGameActive: false,
             isWaiting: false, // シグナル待機中フラグ
+            isDrawWindow: false, // 引き分け判定ウィンドウ
             maxStages: 4
         };
     }
@@ -164,7 +165,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
         // ゲーム背景画像（生成されたサイバー背景を適切なサイズで表示）
-        this.add.image(640, 360, 'gameBackground').setScale(1.0).setDepth(-100); // 最背面に配置
+        this.add.image(960, 540, 'gameBackground').setScale(1.5).setDepth(-100); // 最背面に配置
 
         this.setupUI();
         this.setupCharacters();
@@ -183,7 +184,7 @@ class GameScene extends Phaser.Scene {
 
     setupUI() {
         // ステージ表示
-        this.stageText = this.add.text(640, 50, '', {
+        this.stageText = this.add.text(960, 75, '', {
             fontSize: '28px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -193,7 +194,7 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // スコア表示
-        this.scoreText = this.add.text(150, 50, `まもった: ${this.gameState.score}`, {
+        this.scoreText = this.add.text(225, 75, `まもった: ${this.gameState.score}`, {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -202,7 +203,7 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(1000);
 
         // 難易度表示（画面左下）
-        this.difficultyText = this.add.text(20, 700, '', {
+        this.difficultyText = this.add.text(30, 1050, '', {
             fontSize: '18px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
@@ -212,7 +213,7 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0, 1).setVisible(false).setDepth(1000);
 
         // メッセージ表示エリア
-        this.messageText = this.add.text(640, 600, '', {
+        this.messageText = this.add.text(960, 900, '', {
             fontSize: '24px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
@@ -225,7 +226,7 @@ class GameScene extends Phaser.Scene {
         this.signalGraphics = this.add.graphics().setVisible(false).setDepth(999);
         
         // 危険マーク用のテキスト（シンプルな警告マーク）
-        this.signalText = this.add.text(640, 180, '⚠', {
+        this.signalText = this.add.text(960, 270, '⚠', {
             fontSize: '120px',
             fill: '#FF0000',
             fontFamily: 'Arial',
@@ -236,7 +237,7 @@ class GameScene extends Phaser.Scene {
 
         // フレーム数表示（デジタル時計風）
         this.frameCounter = 0;
-        this.frameCounterText = this.add.text(1230, 660, '', {
+        this.frameCounterText = this.add.text(1845, 990, '', {
             fontSize: '20px',
             fill: '#00FF00',
             fontFamily: 'Courier',
@@ -249,7 +250,7 @@ class GameScene extends Phaser.Scene {
 
     setupCharacters() {
         // プレイヤーキャラクター
-        this.player = this.add.image(300, 500, 'heroNormal').setOrigin(0.5).setScale(0.3).setDepth(100);
+        this.player = this.add.image(450, 750, 'heroNormal').setOrigin(0.5).setScale(0.45).setDepth(100);
 
         // 敵をステージに応じて設定
         this.updateStageAssets();
@@ -267,7 +268,7 @@ class GameScene extends Phaser.Scene {
         if (this.enemy) this.enemy.destroy();
 
         // 敵キャラクター
-        this.enemy = this.add.image(1030, 360, currentThreat).setOrigin(0.5).setDepth(100);
+        this.enemy = this.add.image(1545, 540, currentThreat).setOrigin(0.5).setDepth(100);
     }
 
     updateEnemyState() {
@@ -353,6 +354,7 @@ class GameScene extends Phaser.Scene {
         this.gameState.enemyState = 'normal';
         this.gameState.isWaiting = false;
         this.gameState.isGameActive = false;
+        this.gameState.isDrawWindow = false;
         
         this.updateCharacterSprites();
     }
@@ -392,7 +394,7 @@ class GameScene extends Phaser.Scene {
         
         // 通常モード（ステージ1-4）の演出
         // 背景を徐々に危険な色に変化させる
-        const dangerOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0);
+        const dangerOverlay = this.add.rectangle(960, 540, 1920, 1080, 0x000000, 0);
         
         // 第1段階: 静寂（1秒）- 背景が少し暗くなる
         this.time.delayedCall(1000, () => {
@@ -443,7 +445,7 @@ class GameScene extends Phaser.Scene {
         // 背景に赤い円を追加
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0xFF0000, 0.3);
-        this.signalGraphics.fillCircle(640, 180, 80); // 30px下に移動
+        this.signalGraphics.fillCircle(960, 270, 120); // 30px下に移動
         this.signalGraphics.setVisible(true);
         
         // 点滅エフェクトを削除し、固定表示
@@ -484,9 +486,21 @@ class GameScene extends Phaser.Scene {
         // フレーム数をミリ秒に変換（60fps = 16.67ms/frame）
         const timeLimit = Math.round(targetFrames * 16.67);
         
+        // ターゲットフレーム数を保存（引き分け判定用）
+        this.targetFrames = targetFrames;
+        
         this.defenseTimer = this.time.delayedCall(timeLimit, () => {
             if (this.gameState.isGameActive) {
-                this.onDefenseFail();
+                // 引き分け状態を設定（まだ引き分け処理は実行しない）
+                this.gameState.isDrawWindow = true;
+                
+                // 引き分け判定用のタイマーを設定（1フレーム後に失敗判定）
+                this.drawTimer = this.time.delayedCall(16.67, () => {
+                    if (this.gameState.isGameActive) {
+                        this.gameState.isDrawWindow = false;
+                        this.onDefenseFail();
+                    }
+                });
             }
         });
     }
@@ -504,11 +518,22 @@ class GameScene extends Phaser.Scene {
         if (this.defenseTimer) {
             this.defenseTimer.remove();
         }
+        if (this.drawTimer) {
+            this.drawTimer.remove();
+        }
         
         // フレームカウンター停止・保存（表示は継続）
         const reactionFrames = this.frameCounter;
         
-        this.onDefenseSuccess(reactionFrames);
+        // 引き分け判定
+        if (this.gameState.isDrawWindow) {
+            // 引き分けウィンドウ内での入力 = 引き分け
+            this.gameState.isDrawWindow = false;
+            this.onDefenseDraw();
+        } else {
+            // 通常の成功判定
+            this.onDefenseSuccess(reactionFrames);
+        }
     }
 
     onEarlyClick() {
@@ -543,7 +568,7 @@ class GameScene extends Phaser.Scene {
         // 背景を赤に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0xFF4444, 0.4);
-        this.signalGraphics.fillCircle(640, 180, 80); // 30px下に移動
+        this.signalGraphics.fillCircle(960, 270, 120); // 30px下に移動
         this.signalGraphics.setVisible(true);
         
         // 点滅停止
@@ -583,6 +608,43 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    onDefenseDraw() {
+        // 引き分け時の処理
+        this.gameState.playerState = 'defending';
+        this.updateCharacterSprites();
+        
+        // 軽い画面揺らしエフェクト
+        this.cameras.main.shake(200, 0.01);
+        
+        // 引き分け時の処理
+        this.signalText.setText('=')
+            .setFill('#FFFF00');
+        
+        // 背景を黄色に変更
+        this.signalGraphics.clear();
+        this.signalGraphics.fillStyle(0xFFFF00, 0.3);
+        this.signalGraphics.fillCircle(960, 270, 120);
+        
+        // 点滅停止
+        this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
+        this.signalText.setAlpha(1);
+        this.signalGraphics.setAlpha(1);
+        
+        this.time.delayedCall(800, () => {
+            // 引き分けメッセージ
+            this.showMessage('ひきわけ！もういちど！', 1200, () => {
+                // プレイヤー状態を通常に戻してから再プレイ
+                this.gameState.playerState = 'normal';
+                this.updateCharacterSprites();
+                
+                // スコアは変更せず、同じステージを再プレイ
+                this.time.delayedCall(600, () => {
+                    this.startDefenseRound();
+                });
+            });
+        });
+    }
+
     onDefenseSuccess(reactionFrames) {
         // 即座にガードポーズに切り替え（画面揺れと同時）
         this.gameState.playerState = 'defending';
@@ -598,7 +660,7 @@ class GameScene extends Phaser.Scene {
         // 背景を緑に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0x00FF00, 0.3);
-        this.signalGraphics.fillCircle(640, 180, 80); // 30px下に移動
+        this.signalGraphics.fillCircle(960, 270, 120); // 30px下に移動
         
         // 点滅停止
         this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
@@ -668,7 +730,7 @@ class GameScene extends Phaser.Scene {
         // 背景を赤に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0xFF0000, 0.4);
-        this.signalGraphics.fillCircle(640, 180, 80); // 30px下に移動
+        this.signalGraphics.fillCircle(960, 270, 120); // 30px下に移動
         
         // 点滅停止
         this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
@@ -706,7 +768,7 @@ class GameScene extends Phaser.Scene {
 
     showShieldEffect() {
         // シンプルなシールドエフェクト
-        const shield = this.add.circle(512, 300, 100, 0x3B82F6, 0.5);
+        const shield = this.add.circle(768, 450, 150, 0x3B82F6, 0.5);
         
         this.tweens.add({
             targets: shield,
@@ -799,35 +861,35 @@ class GameScene extends Phaser.Scene {
     updateCharacterSprites() {
         // プレイヤー状態に応じてスプライト更新
         if (this.gameState.playerState === 'defending') {
-            this.player.setTexture('heroDefending').setScale(0.35).setY(500);
+            this.player.setTexture('heroDefending').setScale(0.525).setY(750);
             // 前進アニメーション（右に80px）
             this.tweens.add({
                 targets: this.player,
-                x: 380,
+                x: 570,
                 duration: 150,
                 ease: 'Power2',
             });
         } else if (this.gameState.playerState === 'damaged') {
-            this.player.setTexture('heroDamaged').setScale(0.3).setY(500).setX(300);
+            this.player.setTexture('heroDamaged').setScale(0.45).setY(750).setX(450);
         } else if (this.gameState.playerState === 'victory') {
-            this.player.setTexture('heroVictory').setScale(0.35).setY(450).setX(300); // 勝利時は少し大きく、ジャンプして上に
+            this.player.setTexture('heroVictory').setScale(0.525).setY(675).setX(450); // 勝利時は少し大きく、ジャンプして上に
             
             // 勝利時のジャンプエフェクト
             this.tweens.add({
                 targets: this.player,
-                y: 420, // さらに上に
+                y: 630, // さらに上に
                 duration: 300,
                 ease: 'Power2',
                 yoyo: true,
                 repeat: 1, // 2回ジャンプ
                 onComplete: () => {
-                    this.player.setY(500); // 最終位置に戻す
+                    this.player.setY(750); // 最終位置に戻す
                 }
             });
         } else if (this.gameState.playerState === 'ko') {
-            this.player.setTexture('heroKo').setScale(0.3).setY(500).setX(300);
+            this.player.setTexture('heroKo').setScale(0.45).setY(750).setX(450);
         } else {
-            this.player.setTexture('heroNormal').setScale(0.3).setY(500).setX(300);
+            this.player.setTexture('heroNormal').setScale(0.45).setY(750).setX(450);
         }
     }
 
@@ -863,10 +925,10 @@ class GameScene extends Phaser.Scene {
         }
         
         // ゲームオーバー時の選択肢
-        const buttonY = 540;
+        const buttonY = 810;
         
         // リトライボタン（テキストなしボタン使用）
-        const retryButton = this.add.image(520, buttonY, 'textlessButton')
+        const retryButton = this.add.image(780, buttonY, 'textlessButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -880,7 +942,7 @@ class GameScene extends Phaser.Scene {
             });
 
         // リトライボタンのテキスト
-        this.add.text(520, buttonY, 'もう一度', {
+        this.add.text(780, buttonY, 'もう一度', {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -888,7 +950,7 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5);
             
         // タイトルへボタン（テキストなしボタン使用）
-        const endButton = this.add.image(760, buttonY, 'textlessButton')
+        const endButton = this.add.image(1140, buttonY, 'textlessButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -902,7 +964,7 @@ class GameScene extends Phaser.Scene {
             });
 
         // タイトルへボタンのテキスト
-        this.add.text(760, buttonY, 'タイトルへ', {
+        this.add.text(1140, buttonY, 'タイトルへ', {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -964,7 +1026,7 @@ class EndingScene extends Phaser.Scene {
 
     create() {
         // 背景
-        this.add.rectangle(640, 360, 1280, 720, 0x6B46C1);
+        this.add.rectangle(960, 540, 1920, 1080, 0x6B46C1);
 
         if (this.isGameOver) {
             this.showGameOverEnding();
@@ -977,7 +1039,7 @@ class EndingScene extends Phaser.Scene {
     }
 
     showVictoryEnding() {
-        this.add.text(640, 120, 'ぜんぶクリア！', {
+        this.add.text(960, 180, 'ぜんぶクリア！', {
             fontSize: '48px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
@@ -986,7 +1048,7 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 20, y: 10 }
         }).setOrigin(0.5);
 
-        this.add.text(640, 200, 'DXCのIT(アイティー)をまもってくれてありがとう！', {
+        this.add.text(960, 300, 'DXCのIT(アイティー)をまもってくれてありがとう！', {
             fontSize: '24px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -994,7 +1056,7 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 15, y: 8 }
         }).setOrigin(0.5);
 
-        this.add.text(640, 270, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
+        this.add.text(960, 405, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
             fontSize: '20px',
             fill: '#10B981',
             fontFamily: 'Arial',
@@ -1003,7 +1065,7 @@ class EndingScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // スタートボタンと同じ見た目のタイトルへボタン（SVG使用）
-        const titleButton = this.add.image(640, 340, 'textlessButton')
+        const titleButton = this.add.image(960, 510, 'textlessButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -1017,7 +1079,7 @@ class EndingScene extends Phaser.Scene {
             });
 
         // ボタンの上にテキストを重ねて表示
-        this.add.text(640, 340, 'タイトルへ', {
+        this.add.text(960, 510, 'タイトルへ', {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1026,7 +1088,7 @@ class EndingScene extends Phaser.Scene {
     }
 
     showGameOverEnding() {
-        this.add.text(640, 180, 'ゲームしゅうりょう', {
+        this.add.text(960, 270, 'ゲームしゅうりょう', {
             fontSize: '36px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1034,7 +1096,7 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 18, y: 9 }
         }).setOrigin(0.5);
 
-        this.add.text(640, 250, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
+        this.add.text(960, 375, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
             fontSize: '20px',
             fill: '#10B981',
             fontFamily: 'Arial',
@@ -1043,7 +1105,7 @@ class EndingScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // スタートボタンと同じ見た目のタイトルへボタン（SVG使用）
-        const titleButton = this.add.image(640, 320, 'textlessButton')
+        const titleButton = this.add.image(960, 480, 'textlessButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -1057,7 +1119,7 @@ class EndingScene extends Phaser.Scene {
             });
 
         // ボタンの上にテキストを重ねて表示
-        this.add.text(640, 320, 'タイトルへ', {
+        this.add.text(960, 480, 'タイトルへ', {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1066,7 +1128,7 @@ class EndingScene extends Phaser.Scene {
     }
 
     showDXCBranding() {
-        this.add.text(640, 450, 'DXC Technology', {
+        this.add.text(960, 675, 'DXC Technology', {
             fontSize: '32px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1075,7 +1137,7 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 16, y: 8 }
         }).setOrigin(0.5);
 
-        this.add.text(640, 510, 'ファミリーデイにさんかしてくれて\nありがとうございます', {
+        this.add.text(960, 765, 'ファミリーデイにさんかしてくれて\nありがとうございます', {
             fontSize: '18px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1084,7 +1146,7 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
 
-        this.add.text(640, 610, 'また来年のファミリーデイで\nおあいしましょう！', {
+        this.add.text(960, 915, 'また来年のファミリーデイで\nおあいしましょう！', {
             fontSize: '16px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
@@ -1117,14 +1179,14 @@ window.addEventListener('error', (event) => {
 // ゲーム設定
 const gameConfig = {
     type: Phaser.AUTO,
-    width: 1280,
-    height: 720,
+    width: 1920,
+    height: 1080,
     backgroundColor: '#1a1a2e',
     parent: 'game-container',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        min: { width: 640, height: 360 },
+        min: { width: 960, height: 540 },
         max: { width: 1920, height: 1080 }
     },
     physics: {
