@@ -379,7 +379,7 @@ class MenuScene extends Phaser.Scene {
             fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(1000);
 
-        // ===== デモアニメーション =====
+        // ===== デモアニメーション関数定義 =====
         
         // 警告シグナル背景描画（赤）
         const drawWarningBackground = () => {
