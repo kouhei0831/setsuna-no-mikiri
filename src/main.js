@@ -112,15 +112,15 @@ class MenuScene extends Phaser.Scene {
         // シグナル背景（赤い円）
         const demoSignalBg = this.add.graphics().setDepth(999);
         
-        // マウスクリック指示
-        const clickPrompt = this.add.text(960, 400, 'マウスでクリック！', {
-            fontSize: '36px',
+        // マウスクリック指示（アニメーション対応）
+        const clickPrompt = this.add.text(960, 450, 'マウスでクリック！', {
+            fontSize: '40px',
             fill: '#FFFF00',
             fontFamily: 'Arial',
             fontWeight: 'bold',
             stroke: '#000000',
             strokeThickness: 4
-        }).setOrigin(0.5).setVisible(false).setDepth(1000);
+        }).setOrigin(0.5).setDepth(1000).setAlpha(0).setScale(2.0);
         
         // 警告シグナル背景描画（赤）
         const drawWarningBackground = () => {
@@ -136,13 +136,36 @@ class MenuScene extends Phaser.Scene {
             demoSignalBg.fillCircle(960, 270, 120);
         };
         
+        // クリック指示のアニメーション表示
+        const showClickPrompt = () => {
+            clickPrompt.setAlpha(0).setScale(1.8);
+            this.tweens.add({
+                targets: clickPrompt,
+                alpha: 1,
+                scale: 1.0,
+                duration: 250,
+                ease: 'Back.out'
+            });
+        };
+        
+        // クリック指示のアニメーション非表示
+        const hideClickPrompt = () => {
+            this.tweens.add({
+                targets: clickPrompt,
+                alpha: 0,
+                scale: 0.7,
+                duration: 200,
+                ease: 'Power2.in'
+            });
+        };
+        
         // シンプルなデモループ
         const playDemo = () => {
             // リセット
             demoPlayer.setTexture('heroNormal');
             demoSignal.setVisible(false);
             demoSignalBg.clear();
-            clickPrompt.setVisible(false);
+            clickPrompt.setAlpha(0);
             
             // 1秒後にシグナル表示
             this.time.delayedCall(1000, () => {
@@ -150,17 +173,55 @@ class MenuScene extends Phaser.Scene {
                 demoSignal.setText('⚠').setFill('#FF0000');
                 demoSignal.setVisible(true);
                 drawWarningBackground();
-                clickPrompt.setVisible(true);
+                
+                // クリック指示をアニメーションで表示
+                showClickPrompt();
                 
                 // 1.5秒後に防御
                 this.time.delayedCall(1500, () => {
                     // 防御発動（シールドエフェクトなし）
                     demoPlayer.setTexture('heroDefending');
-                    clickPrompt.setVisible(false);
+                    
+                    // クリック指示をアニメーションで非表示
+                    hideClickPrompt();
                     
                     // 成功シグナルに変更（本編と同じ）
                     demoSignal.setText('✓').setFill('#00FF00');
                     drawSuccessBackground();
+                    
+                    // 成功メッセージ表示（センスの良いアニメーション）
+                    const successMessage = this.add.text(960, 450, 'せいこう！！', {
+                        fontSize: '56px',
+                        fill: '#00FF00',
+                        fontFamily: 'Arial',
+                        fontWeight: 'bold',
+                        stroke: '#FFFFFF',
+                        strokeThickness: 5
+                    }).setOrigin(0.5).setDepth(1000).setAlpha(0).setScale(2.0);
+                    
+                    // エレガントな登場アニメーション
+                    this.tweens.add({
+                        targets: successMessage,
+                        alpha: 1,
+                        scale: 1.0,
+                        duration: 300,
+                        ease: 'Back.out',
+                        onComplete: () => {
+                            // 0.8秒表示後、フェードアウト
+                            this.time.delayedCall(800, () => {
+                                this.tweens.add({
+                                    targets: successMessage,
+                                    alpha: 0,
+                                    scale: 0.8,
+                                    duration: 400,
+                                    ease: 'Power2.in',
+                                    onComplete: () => {
+                                        successMessage.destroy();
+                                    }
+                                });
+                            });
+                        }
+                    });
                     
                     // 1.5秒後にリセット
                     this.time.delayedCall(1500, () => {
