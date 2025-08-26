@@ -112,9 +112,9 @@ class MenuScene extends Phaser.Scene {
         // シグナル背景（赤い円）
         const demoSignalBg = this.add.graphics().setDepth(999);
         
-        // タップ指示
-        const tapPrompt = this.add.text(960, 400, 'タップ！', {
-            fontSize: '48px',
+        // マウスクリック指示
+        const clickPrompt = this.add.text(960, 400, 'マウスでクリック！', {
+            fontSize: '36px',
             fill: '#FFFF00',
             fontFamily: 'Arial',
             fontWeight: 'bold',
@@ -142,7 +142,7 @@ class MenuScene extends Phaser.Scene {
             demoPlayer.setTexture('heroNormal');
             demoSignal.setVisible(false);
             demoSignalBg.clear();
-            tapPrompt.setVisible(false);
+            clickPrompt.setVisible(false);
             
             // 1秒後にシグナル表示
             this.time.delayedCall(1000, () => {
@@ -150,13 +150,13 @@ class MenuScene extends Phaser.Scene {
                 demoSignal.setText('⚠').setFill('#FF0000');
                 demoSignal.setVisible(true);
                 drawWarningBackground();
-                tapPrompt.setVisible(true);
+                clickPrompt.setVisible(true);
                 
                 // 1.5秒後に防御
                 this.time.delayedCall(1500, () => {
                     // 防御発動（シールドエフェクトなし）
                     demoPlayer.setTexture('heroDefending');
-                    tapPrompt.setVisible(false);
+                    clickPrompt.setVisible(false);
                     
                     // 成功シグナルに変更（本編と同じ）
                     demoSignal.setText('✓').setFill('#00FF00');
