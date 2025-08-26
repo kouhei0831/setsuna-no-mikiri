@@ -239,27 +239,56 @@ class MenuScene extends Phaser.Scene {
         // デモ開始
         this.time.delayedCall(500, playDemo);
 
-        // ===== ゲームスタート案内 =====
+        // ===== 大きくて目立つゲームスタートボタン =====
 
-        // ゲームスタート案内
-        const startCardBg = this.add.graphics();
-        startCardBg.fillGradientStyle(0xF59E0B, 0xFFB74D, 0xF59E0B, 0xFFB74D, 0.95);
-        startCardBg.fillRoundedRect(660, 800, 600, 50, 12);
-        startCardBg.lineStyle(3, 0xFFFFFF, 0.3);
-        startCardBg.strokeRoundedRect(660, 800, 600, 50, 12);
-        startCardBg.setDepth(999);
+        // メインのゲームスタートボタン（大きく紫色）
+        const mainStartBg = this.add.graphics();
+        mainStartBg.fillGradientStyle(0x6B46C1, 0x8B5CF6, 0x6B46C1, 0x8B5CF6, 0.95);
+        mainStartBg.fillRoundedRect(560, 780, 800, 80, 15);
+        mainStartBg.lineStyle(4, 0xFFFFFF, 0.5);
+        mainStartBg.strokeRoundedRect(560, 780, 800, 80, 15);
+        mainStartBg.setDepth(999);
 
-        this.add.text(960, 825, '⚡ ゲームスタート！⚡', {
-            fontSize: '26px',
+        const mainStartText = this.add.text(960, 820, '⚡ ゲームスタート！⚡', {
+            fontSize: '36px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
             fontWeight: 'bold'
-        }).setOrigin(0.5).setDepth(1000).setShadow(2, 2, '#000000', 5);
+        }).setOrigin(0.5).setDepth(1000).setShadow(3, 3, '#000000', 6);
 
-        // ===== 日本語のみの難易度ボタン =====
+        // メインボタンのインタラクティブエリア
+        const mainStartArea = this.add.rectangle(960, 820, 800, 80, 0x000000, 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.scene.start('GameScene', { difficulty: 'normal' });
+            })
+            .on('pointerover', () => {
+                // グロー効果
+                mainStartBg.clear();
+                mainStartBg.fillGradientStyle(0x6B46C1, 0x8B5CF6, 0x6B46C1, 0x8B5CF6, 1.0);
+                mainStartBg.fillRoundedRect(560, 780, 800, 80, 15);
+                mainStartBg.lineStyle(6, 0xFFFFFF, 0.9);
+                mainStartBg.strokeRoundedRect(560, 780, 800, 80, 15);
+                
+                mainStartText.setTint(0xFFFFFF);
+            })
+            .on('pointerout', () => {
+                // 元の状態
+                mainStartBg.clear();
+                mainStartBg.fillGradientStyle(0x6B46C1, 0x8B5CF6, 0x6B46C1, 0x8B5CF6, 0.95);
+                mainStartBg.fillRoundedRect(560, 780, 800, 80, 15);
+                mainStartBg.lineStyle(4, 0xFFFFFF, 0.5);
+                mainStartBg.strokeRoundedRect(560, 780, 800, 80, 15);
+                
+                mainStartText.clearTint();
+            });
         
-        const buttonY = 900;
-        const buttonSpacing = 200;
+        mainStartArea.setDepth(1001);
+
+        // ===== 小さな難易度選択ボタン =====
+        
+        const buttonY = 940;
+        const buttonSpacing = 180;
         const buttonColors = [
             { primary: 0x4ADE80, secondary: 0x22C55E }, // 緑 - かんたん
             { primary: 0xF59E0B, secondary: 0xD97706 }, // オレンジ - むずかしい
@@ -276,45 +305,43 @@ class MenuScene extends Phaser.Scene {
             const x = 960 + (index - 1) * buttonSpacing;
             const colors = buttonColors[index];
             
-            // ボタン背景（固定座標で描画、スケール変更なし）
+            // ボタン背景（小さくした）
             const buttonBg = this.add.graphics();
             buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 0.9);
-            buttonBg.fillRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
+            buttonBg.fillRoundedRect(x - 60, buttonY - 15, 120, 30, 6);
             buttonBg.lineStyle(2, 0xFFFFFF, 0.4);
-            buttonBg.strokeRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
+            buttonBg.strokeRoundedRect(x - 60, buttonY - 15, 120, 30, 6);
             buttonBg.setDepth(999);
             
-            // ボタンテキスト
+            // ボタンテキスト（小さくした）
             const buttonText = this.add.text(x, buttonY, diff.text, {
-                fontSize: '18px',
+                fontSize: '14px',
                 fill: '#FFFFFF',
                 fontFamily: 'Arial',
                 fontWeight: 'bold'
-            }).setOrigin(0.5).setDepth(1000).setShadow(1, 1, '#000000', 3);
+            }).setOrigin(0.5).setDepth(1000).setShadow(1, 1, '#000000', 2);
             
-            // インタラクティブエリア（スケール変更なし、色変更のみ）
-            const buttonArea = this.add.rectangle(x, buttonY, 160, 40, 0x000000, 0)
+            // インタラクティブエリア
+            const buttonArea = this.add.rectangle(x, buttonY, 120, 30, 0x000000, 0)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
                     this.scene.start('GameScene', { difficulty: diff.difficulty });
                 })
                 .on('pointerover', () => {
-                    // スケール変更なし、グロー効果のみ
                     buttonBg.clear();
                     buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 1.0);
-                    buttonBg.fillRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
-                    buttonBg.lineStyle(4, 0xFFFFFF, 0.9);
-                    buttonBg.strokeRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
+                    buttonBg.fillRoundedRect(x - 60, buttonY - 15, 120, 30, 6);
+                    buttonBg.lineStyle(3, 0xFFFFFF, 0.8);
+                    buttonBg.strokeRoundedRect(x - 60, buttonY - 15, 120, 30, 6);
                     
                     buttonText.setTint(0xFFFFFF);
                 })
                 .on('pointerout', () => {
-                    // 元の状態に戻す
                     buttonBg.clear();
                     buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 0.9);
-                    buttonBg.fillRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
+                    buttonBg.fillRoundedRect(x - 60, buttonY - 15, 120, 30, 6);
                     buttonBg.lineStyle(2, 0xFFFFFF, 0.4);
-                    buttonBg.strokeRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
+                    buttonBg.strokeRoundedRect(x - 60, buttonY - 15, 120, 30, 6);
                     
                     buttonText.clearTint();
                 });
@@ -351,6 +378,125 @@ class MenuScene extends Phaser.Scene {
             fontFamily: 'Courier',
             fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(1000);
+
+        // ===== デモアニメーション =====
+        
+        // 警告シグナル背景描画（赤）
+        const drawWarningBackground = () => {
+            demoSignalBg.clear();
+            demoSignalBg.fillStyle(0xFF0000, 0.3);
+            demoSignalBg.fillCircle(960, 270, 120);
+        };
+        
+        // 成功シグナル背景描画（緑）
+        const drawSuccessBackground = () => {
+            demoSignalBg.clear();
+            demoSignalBg.fillStyle(0x00FF00, 0.3);
+            demoSignalBg.fillCircle(960, 270, 120);
+        };
+        
+        // クリック指示のアニメーション表示
+        const showClickPrompt = () => {
+            clickPrompt.setAlpha(0).setScale(1.8);
+            this.tweens.add({
+                targets: clickPrompt,
+                alpha: 1,
+                scale: 1.0,
+                duration: 250,
+                ease: 'Back.out'
+            });
+        };
+        
+        // クリック指示のアニメーション非表示
+        const hideClickPrompt = () => {
+            this.tweens.add({
+                targets: clickPrompt,
+                alpha: 0,
+                scale: 0.7,
+                duration: 200,
+                ease: 'Power2.in'
+            });
+        };
+        
+        // シンプルなデモループ
+        const playDemo = () => {
+            // リセット
+            demoPlayer.setTexture('heroNormal');
+            demoSignal.setVisible(false);
+            demoSignalBg.clear();
+            clickPrompt.setAlpha(0);
+            
+            // 1秒後にシグナル表示
+            this.time.delayedCall(1000, () => {
+                // 警告シグナル表示
+                demoSignal.setText('⚠').setFill('#FF0000');
+                demoSignal.setVisible(true);
+                drawWarningBackground();
+                
+                // クリック指示をアニメーションで表示
+                showClickPrompt();
+                
+                // 1.5秒後に防御
+                this.time.delayedCall(1500, () => {
+                    // 防御発動（シールドエフェクトなし）
+                    demoPlayer.setTexture('heroDefending');
+                    
+                    // クリック指示をアニメーションで非表示
+                    hideClickPrompt();
+                    
+                    // 成功シグナルに変更（本編と同じ）
+                    demoSignal.setText('✓').setFill('#00FF00');
+                    drawSuccessBackground();
+                    
+                    // 成功メッセージ表示（センスの良いアニメーション）
+                    const successMessage = this.add.text(960, 450, 'せいこう！！', {
+                        fontSize: '56px',
+                        fill: '#00FF00',
+                        fontFamily: 'Arial',
+                        fontWeight: 'bold',
+                        stroke: '#FFFFFF',
+                        strokeThickness: 5
+                    }).setOrigin(0.5).setDepth(1000).setAlpha(0).setScale(2.0);
+                    
+                    // エレガントな登場アニメーション
+                    this.tweens.add({
+                        targets: successMessage,
+                        alpha: 1,
+                        scale: 1.0,
+                        duration: 300,
+                        ease: 'Back.out',
+                        onComplete: () => {
+                            // 0.8秒表示後、フェードアウト
+                            this.time.delayedCall(800, () => {
+                                this.tweens.add({
+                                    targets: successMessage,
+                                    alpha: 0,
+                                    scale: 0.8,
+                                    duration: 400,
+                                    ease: 'Power2.in',
+                                    onComplete: () => {
+                                        successMessage.destroy();
+                                    }
+                                });
+                            });
+                        }
+                    });
+                    
+                    // 1.5秒後にリセット
+                    this.time.delayedCall(1500, () => {
+                        demoPlayer.setTexture('heroNormal');
+                        demoSignal.setVisible(false);
+                        demoSignalBg.clear();
+                        
+                        // 2秒後に再開
+                        this.time.delayedCall(2000, playDemo);
+                    });
+                });
+            });
+        };
+        
+        // デモ開始
+        this.time.delayedCall(500, playDemo);
     }
 
     showDifficultyHint(text) {
