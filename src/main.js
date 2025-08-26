@@ -130,6 +130,7 @@ class MenuScene extends Phaser.Scene {
             backgroundColor: '#000000',
             padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
+
     }
 }
 
@@ -137,14 +138,14 @@ class MenuScene extends Phaser.Scene {
 class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
+        
         this.gameState = {
-            stage: 1,
+            stage: 1, // 常にステージ1から開始
             score: 0, // デフォルト値
             playerState: 'normal',
             enemyState: 'normal',
             isGameActive: false,
             isWaiting: false, // シグナル待機中フラグ
-            isDrawWindow: false, // 引き分け判定ウィンドウ
             maxStages: 4
         };
     }
@@ -310,7 +311,7 @@ class GameScene extends Phaser.Scene {
         const cycleStage = ((this.gameState.stage - 1) % 4) + 1; // 1-4のサイクル
         const stageName = baseStageNames[cycleStage - 1] || 'IT';
         
-        // 難易度表示
+        // 難易度表示（ステージベース - 元の細かい調整を維持）
         let difficultyLabel = '';
         let difficultyColor = '#F59E0B'; // デフォルト色
         
@@ -354,12 +355,19 @@ class GameScene extends Phaser.Scene {
         this.gameState.enemyState = 'normal';
         this.gameState.isWaiting = false;
         this.gameState.isGameActive = false;
-        this.gameState.isDrawWindow = false;
+        
+        // 統一タイマーをクリーンアップ
+        if (this.unifiedTimer) {
+            this.unifiedTimer.remove();
+            this.unifiedTimer = null;
+        }
         
         this.updateCharacterSprites();
     }
 
     startDefenseRound() {
+        console.log(`startDefenseRound called - Stage: ${this.gameState.stage}, playerState: ${this.gameState.playerState}, enemyState: ${this.gameState.enemyState}`);
+        
         // 前回のシグナル表示をクリア
         this.signalText.setVisible(false);
         this.signalGraphics.setVisible(false);
@@ -368,36 +376,54 @@ class GameScene extends Phaser.Scene {
         // すべてのTweenを停止
         this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
         
+        // 統一タイマーをクリーンアップ
+        if (this.unifiedTimer) {
+            console.log('Cleaning up unifiedTimer');
+            this.unifiedTimer.remove();
+            this.unifiedTimer = null;
+        }
+        
+        // ゲーム状態を完全にリセット
+        this.gameState.isGameActive = false;
+        this.gameState.isWaiting = false;
+        
+        console.log('Game state reset complete, calling showBuildupSequence');
+        
         // 緊張感を演出するための段階的な警告
         this.showBuildupSequence();
     }
 
     showBuildupSequence() {
+        console.log(`showBuildupSequence called - Stage: ${this.gameState.stage}`);
+        
         // ハードモード以降（ステージ5以降）では警告演出をスキップ
         if (this.gameState.stage >= 5) {
-            // ランダムな待機時間（2.5～4秒）で緊張感を持たせる
+            console.log('Hard mode - skipping buildup animation');
+            // ランダムな待機時間（2.5〜4秒）で緊張感を持たせる
             const randomWaitTime = 2500 + Math.random() * 1500;
             
             // お手付き判定を1秒前から開始
             this.time.delayedCall(Math.max(0, randomWaitTime - 1000), () => {
+                console.log('Setting waiting state for hard mode');
                 this.gameState.isWaiting = true;
             });
             
             this.time.delayedCall(randomWaitTime, () => {
-                // 待機状態継続（既に開始済み）
-                
+                console.log('Calling showWarningSignal from hard mode');
                 // 直接シグナル表示
                 this.showWarningSignal();
             });
             return;
         }
         
+        console.log('Normal mode - starting buildup animation');
         // 通常モード（ステージ1-4）の演出
         // 背景を徐々に危険な色に変化させる
         const dangerOverlay = this.add.rectangle(960, 540, 1920, 1080, 0x000000, 0);
         
         // 第1段階: 静寂（1秒）- 背景が少し暗くなる
         this.time.delayedCall(1000, () => {
+            console.log('Buildup phase 1 - darkening background');
             this.tweens.add({
                 targets: dangerOverlay,
                 alpha: 0.2,
@@ -406,19 +432,23 @@ class GameScene extends Phaser.Scene {
             
             // 第2段階: 赤い警告開始 - 背景が赤っぽくなり、お手付き判定開始
             this.time.delayedCall(800, () => {
+                console.log('Buildup phase 2 - red warning starts');
                 dangerOverlay.setFillStyle(0x550000); // 濃い赤
                 
                 // 赤いエフェクト開始と同時にお手付き判定開始
                 this.gameState.isWaiting = true;
+                console.log('Setting waiting state for normal mode');
                 
-                // ランダムな待機時間（0.7～0.8秒 = 700～800ms）
+                // ランダムな待機時間（0.7〜0.8秒 = 700〜800ms）
                 const randomWaitTime = 700 + Math.random() * 100;
+                console.log(`Random wait time: ${randomWaitTime}ms`);
                 
                 this.tweens.add({
                     targets: dangerOverlay,
                     alpha: 0.5,
                     duration: randomWaitTime,
                     onComplete: () => {
+                        console.log('Buildup complete - calling showWarningSignal');
                         // シグナル表示
                         dangerOverlay.destroy();
                         this.showWarningSignal();
@@ -429,10 +459,7 @@ class GameScene extends Phaser.Scene {
     }
 
     showWarningSignal() {
-        // お手付き処理済みの場合は何もしない
-        if (!this.gameState.isWaiting && !this.gameState.isGameActive) {
-            return;
-        }
+        console.log(`showWarningSignal called - Stage: ${this.gameState.stage}, isWaiting: ${this.gameState.isWaiting}, isGameActive: ${this.gameState.isGameActive}`);
         
         // 待機状態を終了（お手付き判定終了）
         this.gameState.isWaiting = false;
@@ -459,7 +486,9 @@ class GameScene extends Phaser.Scene {
         
         this.gameState.isGameActive = true;
         
-        // ステージに応じた制限時間（指定されたフレーム数ベース）
+        console.log(`Game state set to active - Stage: ${this.gameState.stage}, isGameActive: ${this.gameState.isGameActive}`);
+        
+        // ステージに応じた制限時間（指定されたフレーム数ベース）- 元の細かい調整を維持
         let targetFrames;
         
         if (this.gameState.stage <= 4) {
@@ -483,56 +512,68 @@ class GameScene extends Phaser.Scene {
             }
         }
         
-        // フレーム数をミリ秒に変換（60fps = 16.67ms/frame）
-        const timeLimit = Math.round(targetFrames * 16.67);
-        
-        // ターゲットフレーム数を保存（引き分け判定用）
+        // ターゲットフレーム数を保存（判定用）
         this.targetFrames = targetFrames;
         
-        this.defenseTimer = this.time.delayedCall(timeLimit, () => {
+        // 拡張制限時間 = 通常制限 + 引き分け1フレーム + 失敗後30フレーム
+        const extendedFrames = targetFrames + 31;
+        const extendedTimeLimit = Math.round(extendedFrames * 16.67);
+        
+        console.log(`Setting unified timer - Stage: ${this.gameState.stage}, targetFrames: ${targetFrames}, extendedFrames: ${extendedFrames}, timeLimit: ${extendedTimeLimit}ms`);
+        
+        // 統一タイマー - 入力がない場合の完全タイムアウト
+        this.unifiedTimer = this.time.delayedCall(extendedTimeLimit, () => {
+            console.log(`Unified timer expired - no input detected`);
             if (this.gameState.isGameActive) {
-                // 引き分け状態を設定（まだ引き分け処理は実行しない）
-                this.gameState.isDrawWindow = true;
-                
-                // 引き分け判定用のタイマーを設定（1フレーム後に失敗判定）
-                this.drawTimer = this.time.delayedCall(16.67, () => {
-                    if (this.gameState.isGameActive) {
-                        this.gameState.isDrawWindow = false;
-                        this.onDefenseFail();
-                    }
-                });
+                this.gameState.isGameActive = false;
+                this.onDefenseFail(); // フレーム数なし（完全に入力なし）
             }
         });
     }
 
     onDefenseInput() {
+        console.log(`onDefenseInput called - Stage: ${this.gameState.stage}, isWaiting: ${this.gameState.isWaiting}, isGameActive: ${this.gameState.isGameActive}, frameCounter: ${this.frameCounter}`);
+        
         // お手付きチェック（シグナル表示前のクリック）
         if (this.gameState.isWaiting) {
+            console.log('Early click detected');
             this.onEarlyClick();
             return;
         }
         
-        if (!this.gameState.isGameActive) return;
-        
-        this.gameState.isGameActive = false;
-        if (this.defenseTimer) {
-            this.defenseTimer.remove();
+        if (!this.gameState.isGameActive) {
+            console.log('Input ignored - game not active');
+            return;
         }
-        if (this.drawTimer) {
-            this.drawTimer.remove();
+        
+        console.log('Processing valid input');
+        this.gameState.isGameActive = false;
+        
+        // 統一タイマーを停止
+        if (this.unifiedTimer) {
+            this.unifiedTimer.remove();
+            this.unifiedTimer = null;
         }
         
         // フレームカウンター停止・保存（表示は継続）
         const reactionFrames = this.frameCounter;
+        const targetFrames = this.targetFrames;
         
-        // 引き分け判定
-        if (this.gameState.isDrawWindow) {
-            // 引き分けウィンドウ内での入力 = 引き分け
-            this.gameState.isDrawWindow = false;
+        console.log(`Input judgment - reactionFrames: ${reactionFrames}, targetFrames: ${targetFrames}`);
+        
+        // 統一判定ロジック
+        if (reactionFrames <= targetFrames) {
+            // 成功判定
+            console.log('Success detected');
+            this.onDefenseSuccess(reactionFrames);
+        } else if (reactionFrames === targetFrames + 1) {
+            // 引き分け判定（1フレームの猶予）
+            console.log('Draw detected - 1 frame tolerance');
             this.onDefenseDraw();
         } else {
-            // 通常の成功判定
-            this.onDefenseSuccess(reactionFrames);
+            // 失敗判定（でもフレーム数は表示）
+            console.log('Failure detected - late input');
+            this.onDefenseFail(reactionFrames);
         }
     }
 
@@ -712,16 +753,11 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    onDefenseFail() {
+    onDefenseFail(reactionFrames) {
         // 失敗時の画面揺らしエフェクト
         this.cameras.main.shake(400, 0.02);
         
         this.gameState.isGameActive = false;
-        
-        // フレームカウンター非表示
-        if (this.frameCounterText) {
-            this.frameCounterText.setVisible(false);
-        }
         
         // 失敗時のシグナル表示
         this.signalText.setText('✕')
@@ -737,6 +773,18 @@ class GameScene extends Phaser.Scene {
         this.signalText.setAlpha(1);
         this.signalGraphics.setAlpha(1);
         
+        // フレーム数が渡された場合（遅延入力）は表示を継続、そうでなければ非表示
+        if (reactionFrames !== undefined) {
+            // 遅延入力の場合：フレームカウンターを表示継続
+            this.frameCounterText.setVisible(true);
+            this.frameCounterText.setText(String(reactionFrames).padStart(4, '0'));
+        } else {
+            // 時間切れ失敗の場合：フレームカウンター非表示
+            if (this.frameCounterText) {
+                this.frameCounterText.setVisible(false);
+            }
+        }
+        
         if (this.gameState.playerState === 'normal') {
             // 1回目の失敗
             this.gameState.playerState = 'damaged';
@@ -744,7 +792,21 @@ class GameScene extends Phaser.Scene {
             
             this.updateCharacterSprites();
             
-            this.showMessage('あぶない！つぎはきをつけて！', 1500, () => {
+            // 反応時間に基づくメッセージ（フレーム数の詳細は表示しない）
+            let failMessage = 'あぶない！つぎはきをつけて！';
+            if (reactionFrames !== undefined) {
+                // 遅延入力の場合、簡潔なメッセージ
+                const delayFrames = reactionFrames - this.targetFrames;
+                if (delayFrames <= 10) { // 10フレーム以内の遅れ
+                    failMessage = 'おしい！もうすこしはやく！';
+                } else if (delayFrames <= 30) { // 30フレーム以内の遅れ
+                    failMessage = 'おそかった！もっとはやく！';
+                } else {
+                    failMessage = 'おそすぎる！もっとはやく！';
+                }
+            }
+            
+            this.showMessage(failMessage, 2000, () => {
                 // 2回目のチャンス - damagedの状態を維持
                 this.gameState.enemyState = 'normal';
                 this.updateCharacterSprites();
@@ -760,7 +822,12 @@ class GameScene extends Phaser.Scene {
             
             this.updateCharacterSprites();
             
-            this.showMessage('やられた！', 1000, () => {
+            let gameOverMessage = 'やられた！';
+            if (reactionFrames !== undefined) {
+                gameOverMessage = 'やられた！おそかった！';
+            }
+            
+            this.showMessage(gameOverMessage, 1500, () => {
                 this.showGameOverOptions();
             });
         }
@@ -901,6 +968,12 @@ class GameScene extends Phaser.Scene {
             this.frameCounterText.setVisible(false);
         }
         
+        // 統一タイマーをクリーンアップ
+        if (this.unifiedTimer) {
+            this.unifiedTimer.remove();
+            this.unifiedTimer = null;
+        }
+        
         // 4ステージごとにエンディング画面に遷移
         if (this.gameState.stage > this.gameState.maxStages && (this.gameState.stage - 1) % 4 === 0) {
             // 4の倍数ステージクリア時のエンディング
@@ -1039,7 +1112,7 @@ class EndingScene extends Phaser.Scene {
     }
 
     showVictoryEnding() {
-        this.add.text(960, 180, 'ぜんぶクリア！', {
+        this.add.text(960, 240, 'ぜんぶクリア！', {
             fontSize: '48px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
@@ -1048,20 +1121,13 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 20, y: 10 }
         }).setOrigin(0.5);
 
-        this.add.text(960, 300, 'DXCのIT(アイティー)をまもってくれてありがとう！', {
+        this.add.text(960, 360, 'DXCのIT（アイティー）をまもってくれて\nありがとう！', {
             fontSize: '24px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
+            align: 'center',
             backgroundColor: '#2d1b69',
             padding: { x: 15, y: 8 }
-        }).setOrigin(0.5);
-
-        this.add.text(960, 405, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
-            fontSize: '20px',
-            fill: '#10B981',
-            fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
 
         // スタートボタンと同じ見た目のタイトルへボタン（SVG使用）
@@ -1088,7 +1154,7 @@ class EndingScene extends Phaser.Scene {
     }
 
     showGameOverEnding() {
-        this.add.text(960, 270, 'ゲームしゅうりょう', {
+        this.add.text(960, 300, 'ゲームしゅうりょう', {
             fontSize: '36px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1096,16 +1162,16 @@ class EndingScene extends Phaser.Scene {
             padding: { x: 18, y: 9 }
         }).setOrigin(0.5);
 
-        this.add.text(960, 375, `${this.finalScore}個のIT(アイティー)をまもりました！`, {
+        this.add.text(960, 420, 'つぎはがんばろう！', {
             fontSize: '20px',
-            fill: '#10B981',
+            fill: '#F59E0B',
             fontFamily: 'Arial',
             backgroundColor: '#000000',
             padding: { x: 12, y: 6 }
         }).setOrigin(0.5);
 
         // スタートボタンと同じ見た目のタイトルへボタン（SVG使用）
-        const titleButton = this.add.image(960, 480, 'textlessButton')
+        const titleButton = this.add.image(960, 520, 'textlessButton')
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
@@ -1119,7 +1185,7 @@ class EndingScene extends Phaser.Scene {
             });
 
         // ボタンの上にテキストを重ねて表示
-        this.add.text(960, 480, 'タイトルへ', {
+        this.add.text(960, 520, 'タイトルへ', {
             fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1175,6 +1241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('error', (event) => {
     console.error('ゲームエラー:', event.error);
 });
+
 
 // ゲーム設定
 const gameConfig = {
