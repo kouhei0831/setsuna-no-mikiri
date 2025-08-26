@@ -122,20 +122,6 @@ class MenuScene extends Phaser.Scene {
             strokeThickness: 4
         }).setOrigin(0.5).setDepth(1000).setAlpha(0).setScale(2.0);
         
-        // 警告シグナル背景描画（赤）
-        const drawWarningBackground = () => {
-            demoSignalBg.clear();
-            demoSignalBg.fillStyle(0xFF0000, 0.3);
-            demoSignalBg.fillCircle(960, 270, 120);
-        };
-        
-        // 成功シグナル背景描画（緑）
-        const drawSuccessBackground = () => {
-            demoSignalBg.clear();
-            demoSignalBg.fillStyle(0x00FF00, 0.3);
-            demoSignalBg.fillCircle(960, 270, 120);
-        };
-        
         // クリック指示のアニメーション表示
         const showClickPrompt = () => {
             clickPrompt.setAlpha(0).setScale(1.8);
