@@ -76,16 +76,16 @@ class MenuScene extends Phaser.Scene {
         overlay.fillRect(0, 0, 1920, 1080);
         overlay.setDepth(-50);
 
-        // ===== 洗練されたタイトルデザイン（さらに上に移動） =====
+        // ===== 洗練されたタイトルデザイン =====
         
         // タイトル背景（グラデーション）
         const titleBg = this.add.graphics();
         titleBg.fillGradientStyle(0x6B46C1, 0x8B5CF6, 0x6B46C1, 0x8B5CF6, 0.9);
-        titleBg.fillRoundedRect(480, 20, 960, 80, 15);
+        titleBg.fillRoundedRect(480, 20, 960, 70, 15);
         titleBg.setDepth(998);
         
         // タイトルメイン
-        this.add.text(960, 60, '刹那の見切り', {
+        this.add.text(960, 55, '刹那の見切り', {
             fontSize: '42px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -93,14 +93,6 @@ class MenuScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 2
         }).setOrigin(0.5).setDepth(1000).setShadow(3, 3, '#000000', 8);
-
-        // サブタイトル
-        this.add.text(960, 90, 'SETSUNA NO MIKIRI', {
-            fontSize: '14px',
-            fill: '#E0E0E0',
-            fontFamily: 'Arial',
-            letterSpacing: 2
-        }).setOrigin(0.5).setDepth(1000);
 
         // ===== デモエリア（変更なし - 見やすさ重視） =====
         
@@ -186,14 +178,14 @@ class MenuScene extends Phaser.Scene {
         // デモ開始
         this.time.delayedCall(500, playDemo);
 
-        // ===== 洗練された UI デザイン（さらに上に移動） =====
+        // ===== ゲームスタート案内 =====
 
-        // ゲームスタート案内（美しいカード風デザイン）
+        // ゲームスタート案内
         const startCardBg = this.add.graphics();
         startCardBg.fillGradientStyle(0xF59E0B, 0xFFB74D, 0xF59E0B, 0xFFB74D, 0.95);
-        startCardBg.fillRoundedRect(660, 800, 600, 70, 12);
+        startCardBg.fillRoundedRect(660, 800, 600, 50, 12);
         startCardBg.lineStyle(3, 0xFFFFFF, 0.3);
-        startCardBg.strokeRoundedRect(660, 800, 600, 70, 12);
+        startCardBg.strokeRoundedRect(660, 800, 600, 50, 12);
         startCardBg.setDepth(999);
 
         this.add.text(960, 825, '⚡ ゲームスタート！⚡', {
@@ -203,14 +195,7 @@ class MenuScene extends Phaser.Scene {
             fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(1000).setShadow(2, 2, '#000000', 5);
 
-        this.add.text(960, 850, 'CHOOSE YOUR DIFFICULTY', {
-            fontSize: '13px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            letterSpacing: 1
-        }).setOrigin(0.5).setDepth(1000);
-
-        // ===== モダンな難易度ボタンデザイン（ホバーバグ修正） =====
+        // ===== 日本語のみの難易度ボタン =====
         
         const buttonY = 900;
         const buttonSpacing = 200;
@@ -221,9 +206,9 @@ class MenuScene extends Phaser.Scene {
         ];
         
         const difficulties = [
-            { text: 'かんたん', subtext: 'NORMAL', difficulty: 'normal' },
-            { text: 'むずかしい', subtext: 'HARD', difficulty: 'hard' },
-            { text: 'ちょうむずかしい', subtext: 'EXTREME', difficulty: 'extreme' }
+            { text: 'かんたん', difficulty: 'normal' },
+            { text: 'むずかしい', difficulty: 'hard' },
+            { text: 'ちょうむずかしい', difficulty: 'extreme' }
         ];
 
         difficulties.forEach((diff, index) => {
@@ -233,28 +218,21 @@ class MenuScene extends Phaser.Scene {
             // ボタン背景（固定座標で描画、スケール変更なし）
             const buttonBg = this.add.graphics();
             buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 0.9);
-            buttonBg.fillRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+            buttonBg.fillRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
             buttonBg.lineStyle(2, 0xFFFFFF, 0.4);
-            buttonBg.strokeRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+            buttonBg.strokeRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
             buttonBg.setDepth(999);
             
             // ボタンテキスト
-            const buttonText = this.add.text(x, buttonY - 8, diff.text, {
+            const buttonText = this.add.text(x, buttonY, diff.text, {
                 fontSize: '18px',
                 fill: '#FFFFFF',
                 fontFamily: 'Arial',
                 fontWeight: 'bold'
             }).setOrigin(0.5).setDepth(1000).setShadow(1, 1, '#000000', 3);
             
-            const subText = this.add.text(x, buttonY + 12, diff.subtext, {
-                fontSize: '11px',
-                fill: '#E0E0E0',
-                fontFamily: 'Arial',
-                letterSpacing: 1
-            }).setOrigin(0.5).setDepth(1000);
-            
             // インタラクティブエリア（スケール変更なし、色変更のみ）
-            const buttonArea = this.add.rectangle(x, buttonY, 160, 50, 0x000000, 0)
+            const buttonArea = this.add.rectangle(x, buttonY, 160, 40, 0x000000, 0)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
                     this.scene.start('GameScene', { difficulty: diff.difficulty });
@@ -263,23 +241,21 @@ class MenuScene extends Phaser.Scene {
                     // スケール変更なし、グロー効果のみ
                     buttonBg.clear();
                     buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 1.0);
-                    buttonBg.fillRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    buttonBg.fillRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
                     buttonBg.lineStyle(4, 0xFFFFFF, 0.9);
-                    buttonBg.strokeRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    buttonBg.strokeRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
                     
                     buttonText.setTint(0xFFFFFF);
-                    subText.setTint(0xFFFFFF);
                 })
                 .on('pointerout', () => {
                     // 元の状態に戻す
                     buttonBg.clear();
                     buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 0.9);
-                    buttonBg.fillRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    buttonBg.fillRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
                     buttonBg.lineStyle(2, 0xFFFFFF, 0.4);
-                    buttonBg.strokeRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    buttonBg.strokeRoundedRect(x - 80, buttonY - 20, 160, 40, 8);
                     
                     buttonText.clearTint();
-                    subText.clearTint();
                 });
             
             buttonArea.setDepth(1001);
