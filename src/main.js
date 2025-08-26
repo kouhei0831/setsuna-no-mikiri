@@ -67,70 +67,274 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        // 背景
-        this.add.image(960, 540, 'menuBackground').setScale(2.4);
+        // ゲーム背景（本編と同じ）
+        this.add.image(960, 540, 'gameBackground').setScale(1.5).setDepth(-100);
 
-        // バージョン表示（背景の後に配置して最前面に）
-        this.add.text(20, 20, 'v2.0.0', {
-            fontSize: '18px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 8, y: 4 },
-            stroke: '#6B46C1',
-            strokeThickness: 2
-        }).setOrigin(0, 0).setDepth(1000);
+        // 背景オーバーレイで統一感を演出
+        const overlay = this.add.graphics();
+        overlay.fillGradientStyle(0x000000, 0x000000, 0x1a1a2e, 0x1a1a2e, 0.4);
+        overlay.fillRect(0, 0, 1920, 1080);
+        overlay.setDepth(-50);
 
-        // タイトル
-        this.add.text(960, 300, '刹那の見切り【テスト版】', {
-            fontSize: '56px',
+        // ===== 洗練されたタイトルデザイン（さらに上に移動） =====
+        
+        // タイトル背景（グラデーション）
+        const titleBg = this.add.graphics();
+        titleBg.fillGradientStyle(0x6B46C1, 0x8B5CF6, 0x6B46C1, 0x8B5CF6, 0.9);
+        titleBg.fillRoundedRect(480, 20, 960, 80, 15);
+        titleBg.setDepth(998);
+        
+        // タイトルメイン
+        this.add.text(960, 60, '刹那の見切り', {
+            fontSize: '42px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
             fontWeight: 'bold',
-            stroke: '#6B46C1',
+            stroke: '#000000',
+            strokeThickness: 2
+        }).setOrigin(0.5).setDepth(1000).setShadow(3, 3, '#000000', 8);
+
+        // サブタイトル
+        this.add.text(960, 90, 'SETSUNA NO MIKIRI', {
+            fontSize: '14px',
+            fill: '#E0E0E0',
+            fontFamily: 'Arial',
+            letterSpacing: 2
+        }).setOrigin(0.5).setDepth(1000);
+
+        // ===== デモエリア（変更なし - 見やすさ重視） =====
+        
+        // プレイヤー（本編と同じ位置・サイズ）
+        const demoPlayer = this.add.image(450, 750, 'heroNormal').setOrigin(0.5).setScale(0.45).setDepth(100);
+        
+        // 警告シグナル（本編と同じ）
+        const demoSignal = this.add.text(960, 270, '⚠', {
+            fontSize: '120px',
+            fill: '#FF0000',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            stroke: '#FFFFFF',
             strokeThickness: 6
-        }).setOrigin(0.5);
-
-        this.add.text(960, 405, 'DXCのIT(アイティー)をまもろう！', {
-            fontSize: '28px',
-            fill: '#FFFFFF',
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
+        
+        // シグナル背景（赤い円）
+        const demoSignalBg = this.add.graphics().setDepth(999);
+        
+        // タップ指示
+        const tapPrompt = this.add.text(960, 400, 'タップ！', {
+            fontSize: '48px',
+            fill: '#FFFF00',
             fontFamily: 'Arial',
-            stroke: '#1a1a2e',
+            fontWeight: 'bold',
+            stroke: '#000000',
             strokeThickness: 4
-        }).setOrigin(0.5);
-
-        // スタートボタン
-        const startButton = this.add.image(960, 630, 'startButton')
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
-                this.scene.start('GameScene');
-            })
-            .on('pointerover', () => {
-                startButton.setScale(1.1);
-            })
-            .on('pointerout', () => {
-                startButton.setScale(1.0);
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
+        
+        // 警告シグナル背景描画（赤）
+        const drawWarningBackground = () => {
+            demoSignalBg.clear();
+            demoSignalBg.fillStyle(0xFF0000, 0.3);
+            demoSignalBg.fillCircle(960, 270, 120);
+        };
+        
+        // 成功シグナル背景描画（緑）
+        const drawSuccessBackground = () => {
+            demoSignalBg.clear();
+            demoSignalBg.fillStyle(0x00FF00, 0.3);
+            demoSignalBg.fillCircle(960, 270, 120);
+        };
+        
+        // シンプルなデモループ
+        const playDemo = () => {
+            // リセット
+            demoPlayer.setTexture('heroNormal');
+            demoSignal.setVisible(false);
+            demoSignalBg.clear();
+            tapPrompt.setVisible(false);
+            
+            // 1秒後にシグナル表示
+            this.time.delayedCall(1000, () => {
+                // 警告シグナル表示
+                demoSignal.setText('⚠').setFill('#FF0000');
+                demoSignal.setVisible(true);
+                drawWarningBackground();
+                tapPrompt.setVisible(true);
+                
+                // 1.5秒後に防御
+                this.time.delayedCall(1500, () => {
+                    // 防御発動（シールドエフェクトなし）
+                    demoPlayer.setTexture('heroDefending');
+                    tapPrompt.setVisible(false);
+                    
+                    // 成功シグナルに変更（本編と同じ）
+                    demoSignal.setText('✓').setFill('#00FF00');
+                    drawSuccessBackground();
+                    
+                    // 1.5秒後にリセット
+                    this.time.delayedCall(1500, () => {
+                        demoPlayer.setTexture('heroNormal');
+                        demoSignal.setVisible(false);
+                        demoSignalBg.clear();
+                        
+                        // 2秒後に再開
+                        this.time.delayedCall(2000, playDemo);
+                    });
+                });
             });
+        };
+        
+        // デモ開始
+        this.time.delayedCall(500, playDemo);
 
-        // DXCブランディング
-        this.add.text(960, 900, 'DXC Technology Family Day 2025', {
-            fontSize: '16px',
+        // ===== 洗練された UI デザイン（さらに上に移動） =====
+
+        // ゲームスタート案内（美しいカード風デザイン）
+        const startCardBg = this.add.graphics();
+        startCardBg.fillGradientStyle(0xF59E0B, 0xFFB74D, 0xF59E0B, 0xFFB74D, 0.95);
+        startCardBg.fillRoundedRect(660, 800, 600, 70, 12);
+        startCardBg.lineStyle(3, 0xFFFFFF, 0.3);
+        startCardBg.strokeRoundedRect(660, 800, 600, 70, 12);
+        startCardBg.setDepth(999);
+
+        this.add.text(960, 825, '⚡ ゲームスタート！⚡', {
+            fontSize: '26px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            backgroundColor: '#2d1b69',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5);
+            fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(1000).setShadow(2, 2, '#000000', 5);
 
-        // 操作説明
-        this.add.text(960, 780, 'タップして IT をまもろう！', {
-            fontSize: '18px',
-            fill: '#F59E0B',
+        this.add.text(960, 850, 'CHOOSE YOUR DIFFICULTY', {
+            fontSize: '13px',
+            fill: '#FFFFFF',
             fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 12, y: 6 }
-        }).setOrigin(0.5);
+            letterSpacing: 1
+        }).setOrigin(0.5).setDepth(1000);
 
+        // ===== モダンな難易度ボタンデザイン（ホバーバグ修正） =====
+        
+        const buttonY = 900;
+        const buttonSpacing = 200;
+        const buttonColors = [
+            { primary: 0x4ADE80, secondary: 0x22C55E }, // 緑 - かんたん
+            { primary: 0xF59E0B, secondary: 0xD97706 }, // オレンジ - むずかしい
+            { primary: 0xEF4444, secondary: 0xDC2626 }  // 赤 - ちょうむずかしい
+        ];
+        
+        const difficulties = [
+            { text: 'かんたん', subtext: 'NORMAL', difficulty: 'normal' },
+            { text: 'むずかしい', subtext: 'HARD', difficulty: 'hard' },
+            { text: 'ちょうむずかしい', subtext: 'EXTREME', difficulty: 'extreme' }
+        ];
+
+        difficulties.forEach((diff, index) => {
+            const x = 960 + (index - 1) * buttonSpacing;
+            const colors = buttonColors[index];
+            
+            // ボタン背景（固定座標で描画、スケール変更なし）
+            const buttonBg = this.add.graphics();
+            buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 0.9);
+            buttonBg.fillRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+            buttonBg.lineStyle(2, 0xFFFFFF, 0.4);
+            buttonBg.strokeRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+            buttonBg.setDepth(999);
+            
+            // ボタンテキスト
+            const buttonText = this.add.text(x, buttonY - 8, diff.text, {
+                fontSize: '18px',
+                fill: '#FFFFFF',
+                fontFamily: 'Arial',
+                fontWeight: 'bold'
+            }).setOrigin(0.5).setDepth(1000).setShadow(1, 1, '#000000', 3);
+            
+            const subText = this.add.text(x, buttonY + 12, diff.subtext, {
+                fontSize: '11px',
+                fill: '#E0E0E0',
+                fontFamily: 'Arial',
+                letterSpacing: 1
+            }).setOrigin(0.5).setDepth(1000);
+            
+            // インタラクティブエリア（スケール変更なし、色変更のみ）
+            const buttonArea = this.add.rectangle(x, buttonY, 160, 50, 0x000000, 0)
+                .setInteractive({ useHandCursor: true })
+                .on('pointerdown', () => {
+                    this.scene.start('GameScene', { difficulty: diff.difficulty });
+                })
+                .on('pointerover', () => {
+                    // スケール変更なし、グロー効果のみ
+                    buttonBg.clear();
+                    buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 1.0);
+                    buttonBg.fillRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    buttonBg.lineStyle(4, 0xFFFFFF, 0.9);
+                    buttonBg.strokeRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    
+                    buttonText.setTint(0xFFFFFF);
+                    subText.setTint(0xFFFFFF);
+                })
+                .on('pointerout', () => {
+                    // 元の状態に戻す
+                    buttonBg.clear();
+                    buttonBg.fillGradientStyle(colors.primary, colors.secondary, colors.primary, colors.secondary, 0.9);
+                    buttonBg.fillRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    buttonBg.lineStyle(2, 0xFFFFFF, 0.4);
+                    buttonBg.strokeRoundedRect(x - 80, buttonY - 25, 160, 50, 8);
+                    
+                    buttonText.clearTint();
+                    subText.clearTint();
+                });
+            
+            buttonArea.setDepth(1001);
+        });
+
+        // ===== エレガントなフッター =====
+        
+        // フッター背景
+        const footerBg = this.add.graphics();
+        footerBg.fillGradientStyle(0x2d1b69, 0x6B46C1, 0x2d1b69, 0x6B46C1, 0.8);
+        footerBg.fillRect(0, 1080 - 40, 1920, 40);
+        footerBg.setDepth(999);
+
+        // DXCブランディング（よりエレガント）
+        this.add.text(960, 1060, '◆ DXC TECHNOLOGY FAMILY DAY 2025 ◆', {
+            fontSize: '14px',
+            fill: '#FFFFFF',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            letterSpacing: 2
+        }).setOrigin(0.5).setDepth(1000);
+
+        // バージョン表示（左上にスタイリッシュに）
+        const versionBg = this.add.graphics();
+        versionBg.fillStyle(0x000000, 0.7);
+        versionBg.fillRoundedRect(10, 10, 80, 30, 5);
+        versionBg.setDepth(999);
+        
+        this.add.text(50, 25, 'v2.0.0', {
+            fontSize: '14px',
+            fill: '#00FF00',
+            fontFamily: 'Courier',
+            fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(1000);
+    }
+
+    showDifficultyHint(text) {
+        if (this.difficultyHint) {
+            this.difficultyHint.setText(text);
+            this.tweens.add({
+                targets: this.difficultyHint,
+                alpha: 1,
+                duration: 200
+            });
+        }
+    }
+
+    hideDifficultyHint() {
+        if (this.difficultyHint) {
+            this.tweens.add({
+                targets: this.difficultyHint,
+                alpha: 0,
+                duration: 200
+            });
+        }
     }
 }
 
@@ -146,15 +350,26 @@ class GameScene extends Phaser.Scene {
             enemyState: 'normal',
             isGameActive: false,
             isWaiting: false, // シグナル待機中フラグ
-            maxStages: 4
+            maxStages: 4,
+            difficulty: 'normal' // 選択された難易度
         };
     }
 
     init(data) {
-        // リトライ時のスコア復元（コンストラクタの後に実行される）
+        // 難易度設定（メニューからのパラメータまたはリトライ時の保持）
+        if (data && data.difficulty) {
+            this.gameState.difficulty = data.difficulty;
+            console.log('Difficulty set:', this.gameState.difficulty); // デバッグ用
+        }
+        
+        // リトライ時のスコアと難易度復元（コンストラクタの後に実行される）
         if (data && data.preserveScore !== undefined) {
             this.gameState.score = data.preserveScore;
-            console.log('Score restored:', this.gameState.score); // デバッグ用
+            // リトライ時は難易度も保持
+            if (data.preserveDifficulty) {
+                this.gameState.difficulty = data.preserveDifficulty;
+            }
+            console.log('Score restored:', this.gameState.score, 'Difficulty:', this.gameState.difficulty); // デバッグ用
         } else {
             // 新規ゲーム開始時はスコアを0にリセット
             this.gameState.score = 0;
@@ -311,24 +526,24 @@ class GameScene extends Phaser.Scene {
         const cycleStage = ((this.gameState.stage - 1) % 4) + 1; // 1-4のサイクル
         const stageName = baseStageNames[cycleStage - 1] || 'IT';
         
-        // 難易度表示（ステージベース - 元の細かい調整を維持）
+        // 選択された難易度に基づく表示
         let difficultyLabel = '';
         let difficultyColor = '#F59E0B'; // デフォルト色
         
-        if (this.gameState.stage <= 4) {
-            // ステージ1-4: 通常（表示なし）
+        if (this.gameState.difficulty === 'normal') {
+            // 通常難易度（表示なし）
             difficultyLabel = '';
-        } else if (this.gameState.stage <= 8) {
-            // ステージ5-8: ハード
+        } else if (this.gameState.difficulty === 'hard') {
+            // ハード難易度
             difficultyLabel = 'ハードモード';
             difficultyColor = '#FF6B35';
-        } else {
-            // ステージ9以降: エクストリーム
+        } else if (this.gameState.difficulty === 'extreme') {
+            // エクストリーム難易度
             difficultyLabel = 'エクストリームモード';
             difficultyColor = '#FF0000';
         }
         
-        // ステージ名表示（難易度なし）
+        // ステージ名表示
         this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
         this.stageText.setVisible(true);
         
@@ -394,22 +609,22 @@ class GameScene extends Phaser.Scene {
     }
 
     showBuildupSequence() {
-        console.log(`showBuildupSequence called - Stage: ${this.gameState.stage}`);
+        console.log(`showBuildupSequence called - Stage: ${this.gameState.stage}, Difficulty: ${this.gameState.difficulty}`);
         
-        // ハードモード以降（ステージ5以降）では警告演出をスキップ
-        if (this.gameState.stage >= 5) {
-            console.log('Hard mode - skipping buildup animation');
+        // ハード・エクストリーム難易度では警告演出をスキップ
+        if (this.gameState.difficulty === 'hard' || this.gameState.difficulty === 'extreme') {
+            console.log('Hard/Extreme mode - skipping buildup animation');
             // ランダムな待機時間（2.5〜4秒）で緊張感を持たせる
             const randomWaitTime = 2500 + Math.random() * 1500;
             
             // お手付き判定を1秒前から開始
             this.time.delayedCall(Math.max(0, randomWaitTime - 1000), () => {
-                console.log('Setting waiting state for hard mode');
+                console.log('Setting waiting state for hard/extreme mode');
                 this.gameState.isWaiting = true;
             });
             
             this.time.delayedCall(randomWaitTime, () => {
-                console.log('Calling showWarningSignal from hard mode');
+                console.log('Calling showWarningSignal from hard/extreme mode');
                 // 直接シグナル表示
                 this.showWarningSignal();
             });
@@ -417,7 +632,7 @@ class GameScene extends Phaser.Scene {
         }
         
         console.log('Normal mode - starting buildup animation');
-        // 通常モード（ステージ1-4）の演出
+        // 通常難易度の演出
         // 背景を徐々に危険な色に変化させる
         const dangerOverlay = this.add.rectangle(960, 540, 1920, 1080, 0x000000, 0);
         
@@ -459,7 +674,7 @@ class GameScene extends Phaser.Scene {
     }
 
     showWarningSignal() {
-        console.log(`showWarningSignal called - Stage: ${this.gameState.stage}, isWaiting: ${this.gameState.isWaiting}, isGameActive: ${this.gameState.isGameActive}`);
+        console.log(`showWarningSignal called - Stage: ${this.gameState.stage}, Difficulty: ${this.gameState.difficulty}, isWaiting: ${this.gameState.isWaiting}, isGameActive: ${this.gameState.isGameActive}`);
         
         // 待機状態を終了（お手付き判定終了）
         this.gameState.isWaiting = false;
@@ -488,28 +703,29 @@ class GameScene extends Phaser.Scene {
         
         console.log(`Game state set to active - Stage: ${this.gameState.stage}, isGameActive: ${this.gameState.isGameActive}`);
         
-        // ステージに応じた制限時間（指定されたフレーム数ベース）- 元の細かい調整を維持
+        // 選択された難易度に応じた制限時間（ステージに応じてフレーム数調整）
         let targetFrames;
         
-        if (this.gameState.stage <= 4) {
-            // ステージ1-4: 通常難易度
+        if (this.gameState.difficulty === 'normal') {
+            // 通常難易度: ステージ1-4の進行パターン
             const normalFrames = [120, 90, 60, 40];
-            targetFrames = normalFrames[this.gameState.stage - 1];
-        } else if (this.gameState.stage <= 8) {
-            // ステージ5-8: ハード難易度
+            const stageIndex = ((this.gameState.stage - 1) % 4);
+            targetFrames = normalFrames[stageIndex];
+        } else if (this.gameState.difficulty === 'hard') {
+            // ハード難易度: ステージ5-8の進行パターン
             const hardFrames = [20, 18, 16, 14];
-            const hardIndex = (this.gameState.stage - 5) % 4;
-            targetFrames = hardFrames[hardIndex];
-        } else {
-            // ステージ9-12: エクストリーム難易度
+            const stageIndex = ((this.gameState.stage - 1) % 4);
+            targetFrames = hardFrames[stageIndex];
+        } else if (this.gameState.difficulty === 'extreme') {
+            // エクストリーム難易度: ステージ9-12の進行パターン
             const extremeFrames = [14, 13, 12, 11];
-            const extremeIndex = Math.min((this.gameState.stage - 9) % 4, 3);
-            targetFrames = extremeFrames[extremeIndex];
-            
-            // ステージ13以降はエクストリーム最終値（11フレーム）で固定
-            if (this.gameState.stage > 12) {
-                targetFrames = 11;
-            }
+            const stageIndex = ((this.gameState.stage - 1) % 4);
+            targetFrames = extremeFrames[stageIndex];
+        } else {
+            // デフォルトは通常難易度
+            const normalFrames = [120, 90, 60, 40];
+            const stageIndex = ((this.gameState.stage - 1) % 4);
+            targetFrames = normalFrames[stageIndex];
         }
         
         // ターゲットフレーム数を保存（判定用）
@@ -519,7 +735,7 @@ class GameScene extends Phaser.Scene {
         const extendedFrames = targetFrames + 31;
         const extendedTimeLimit = Math.round(extendedFrames * 16.67);
         
-        console.log(`Setting unified timer - Stage: ${this.gameState.stage}, targetFrames: ${targetFrames}, extendedFrames: ${extendedFrames}, timeLimit: ${extendedTimeLimit}ms`);
+        console.log(`Setting unified timer - Stage: ${this.gameState.stage}, Difficulty: ${this.gameState.difficulty}, targetFrames: ${targetFrames}, extendedFrames: ${extendedFrames}, timeLimit: ${extendedTimeLimit}ms`);
         
         // 統一タイマー - 入力がない場合の完全タイムアウト
         this.unifiedTimer = this.time.delayedCall(extendedTimeLimit, () => {
@@ -1046,9 +1262,14 @@ class GameScene extends Phaser.Scene {
     }
 
     restartCurrentStage() {
-        // 現在のスコアを保持してステージを再開
+        // 現在のスコアと難易度を保持してステージを再開
         const currentScore = this.gameState.score;
-        this.scene.restart({ preserveScore: currentScore });
+        const currentDifficulty = this.gameState.difficulty;
+        this.scene.restart({ 
+            preserveScore: currentScore,
+            preserveDifficulty: currentDifficulty,
+            difficulty: currentDifficulty // リトライ時も難易度を渡す
+        });
     }
 
     showEndMessage() {
