@@ -75,7 +75,7 @@ class MenuScene extends Phaser.Scene {
     create() {
         // BGM再生（控えめ音量でループ）
         if (!this.sound.get('titleBgm')) {
-            this.sound.add('titleBgm', { loop: true, volume: 0.1 }).play();
+            this.sound.add('titleBgm', { loop: true, volume: 0.05 }).play();
         }
         
         // ゲーム背景
@@ -273,6 +273,11 @@ class MenuScene extends Phaser.Scene {
         this.add.rectangle(960, 820, 800, 80, 0x000000, 0)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                // BGM停止
+                const titleBgm = this.sound.get('titleBgm');
+                if (titleBgm) {
+                    titleBgm.stop();
+                }
                 this.scene.start('GameScene', { difficulty: 'normal' });
             })
             .on('pointerover', () => {
