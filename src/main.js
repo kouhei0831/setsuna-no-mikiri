@@ -1143,7 +1143,7 @@ class GameScene extends Phaser.Scene {
                     reactionMessage = 'いいタイミング！まもった！';
                 }
                 
-                this.showMessage(reactionMessage, 1200, () => {
+                this.showMessage(reactionMessage, 1800, () => {
                     // スコア加算処理
                     const oldScore = this.gameState.score;
                     this.gameState.score++;
