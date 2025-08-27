@@ -80,17 +80,20 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        // ミュート状態をlocalStorageから読み込み
+        const isMuted = localStorage.getItem('gameAudioMuted') === 'true';
+        
         // BGM再生（控えめ音量でループ）- 確実に音量設定と再生
         const existingTitleBgm = this.sound.get('titleBgm');
         if (existingTitleBgm) {
             // 既存のBGMがある場合は音量を設定し直して再生確認
-            existingTitleBgm.setVolume(0.05);
+            existingTitleBgm.setVolume(isMuted ? 0 : 0.05);
             if (!existingTitleBgm.isPlaying) {
                 existingTitleBgm.play();
             }
         } else {
             // 新規作成
-            this.sound.add('titleBgm', { loop: true, volume: 0.05 }).play();
+            this.sound.add('titleBgm', { loop: true, volume: isMuted ? 0 : 0.05 }).play();
         }
         
         // ゲーム背景
@@ -130,6 +133,57 @@ class MenuScene extends Phaser.Scene {
             fontFamily: 'Arial',
             alpha: 0.7
         }).setOrigin(1, 1).setDepth(100);
+        
+        // ===== ミュートボタン（右上） =====
+        const muteButtonBg = this.add.graphics();
+        muteButtonBg.fillStyle(0x000000, 0.7);
+        muteButtonBg.fillRoundedRect(1830, 10, 80, 40, 5);
+        muteButtonBg.setDepth(999);
+        
+        const muteButtonText = this.add.text(1870, 30, isMuted ? '🔇' : '🔊', {
+            fontSize: '20px',
+            fontFamily: 'Arial'
+        }).setOrigin(0.5).setDepth(1000);
+        
+        const muteLabel = this.add.text(1870, 50, isMuted ? 'OFF' : 'ON', {
+            fontSize: '10px',
+            fill: isMuted ? '#FF6B6B' : '#4ECDC4',
+            fontFamily: 'Arial',
+            fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(1000);
+        
+        // ミュートボタンの操作
+        this.add.rectangle(1870, 30, 80, 40, 0x000000, 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                const newMuteState = !isMuted;
+                localStorage.setItem('gameAudioMuted', newMuteState.toString());
+                
+                // UI更新
+                muteButtonText.setText(newMuteState ? '🔇' : '🔊');
+                muteLabel.setText(newMuteState ? 'OFF' : 'ON');
+                muteLabel.setFill(newMuteState ? '#FF6B6B' : '#4ECDC4');
+                
+                // BGM音量更新
+                const titleBgm = this.sound.get('titleBgm');
+                if (titleBgm) {
+                    titleBgm.setVolume(newMuteState ? 0 : 0.05);
+                }
+                
+                // 更新後の状態を保存
+                isMuted = newMuteState;
+            })
+            .on('pointerover', () => {
+                muteButtonBg.clear();
+                muteButtonBg.fillStyle(0x333333, 0.9);
+                muteButtonBg.fillRoundedRect(1830, 10, 80, 40, 5);
+            })
+            .on('pointerout', () => {
+                muteButtonBg.clear();
+                muteButtonBg.fillStyle(0x000000, 0.7);
+                muteButtonBg.fillRoundedRect(1830, 10, 80, 40, 5);
+            })
+            .setDepth(1001);
         
         // ===== デモエリア =====
         
@@ -288,8 +342,10 @@ class MenuScene extends Phaser.Scene {
         this.add.rectangle(960, 820, 800, 80, 0x000000, 0)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                // ゲームスタート効果音
-                this.sound.play('gameStartSE', { volume: 0.3 });
+                // ゲームスタート効果音（ミュート状態を考慮）
+                if (!isMuted) {
+                    this.sound.play('gameStartSE', { volume: 0.3 });
+                }
                 
                 // BGM停止
                 const titleBgm = this.sound.get('titleBgm');
@@ -374,8 +430,10 @@ class MenuScene extends Phaser.Scene {
             this.add.rectangle(x, buttonY, buttonWidth, buttonHeight, 0x000000, 0)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
-                    // ゲームスタート効果音
-                    this.sound.play('gameStartSE', { volume: 0.3 });
+                    // ゲームスタート効果音（ミュート状態を考慮）
+                    if (!isMuted) {
+                        this.sound.play('gameStartSE', { volume: 0.3 });
+                    }
                     
                     // BGM停止
                     const titleBgm = this.sound.get('titleBgm');
@@ -513,6 +571,9 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        // ミュート状態をlocalStorageから読み込み
+        this.isMuted = localStorage.getItem('gameAudioMuted') === 'true';
+        
         // ゲーム背景画像（生成されたサイバー背景を適切なサイズで表示）
         this.add.image(960, 540, 'gameBackground').setScale(1.5).setDepth(-100); // 最背面に配置
         
@@ -535,17 +596,17 @@ class GameScene extends Phaser.Scene {
         };
         fadeInStep();
         
-        // ゲームBGM再生（控えめ音量でループ）- 確実に音量設定と再生
+        // ゲームBGM再生（控えめ音量でループ）- ミュート状態を考慮
         const existingGameBgm = this.sound.get('gameBgm');
         if (existingGameBgm) {
             // 既存のBGMがある場合は音量を設定し直して再生確認
-            existingGameBgm.setVolume(0.08);
+            existingGameBgm.setVolume(this.isMuted ? 0 : 0.08);
             if (!existingGameBgm.isPlaying) {
                 existingGameBgm.play();
             }
         } else {
             // 新規作成
-            this.sound.add('gameBgm', { loop: true, volume: 0.08 }).play();
+            this.sound.add('gameBgm', { loop: true, volume: this.isMuted ? 0 : 0.08 }).play();
         }
 
         this.setupUI();
@@ -970,12 +1031,14 @@ class GameScene extends Phaser.Scene {
     }
 
     onEarlyClick() {
-        // 失敗効果音を再生
-        this.sound.play('failSE', { volume: 0.5 });
+        // 失敗効果音を再生（ミュート状態を考慮）
+        if (!this.isMuted) {
+            this.sound.play('failSE', { volume: 0.5 });
+        }
         
         // BGM音量を即座に元に戻す（tweenをkillしてから設定）
         const gameBgm = this.sound.get('gameBgm');
-        if (gameBgm) {
+        if (gameBgm && !this.isMuted) {
             this.tweens.killTweensOf(gameBgm);
             gameBgm.setVolume(0.08);
         }
@@ -1034,9 +1097,9 @@ class GameScene extends Phaser.Scene {
             this.updateCharacterSprites();
             
             this.showMessage('1かいめのしっぱい！きをつけて！', 1500, () => {
-                // メッセージが消えるときにBGM音量を下げる
+                // メッセージが消えるときにBGM音量を下げる（ミュート時は何もしない）
                 const gameBgm = this.sound.get('gameBgm');
-                if (gameBgm) {
+                if (gameBgm && !this.isMuted) {
                     this.tweens.add({
                         targets: gameBgm,
                         volume: 0.02,
@@ -1056,9 +1119,9 @@ class GameScene extends Phaser.Scene {
             this.updateCharacterSprites();
             
             this.showMessage('2かいめのしっぱい！', 1000, () => {
-                // メッセージが消えるときにBGM音量を下げる
+                // メッセージが消えるときにBGM音量を下げる（ミュート時は何もしない）
                 const gameBgm = this.sound.get('gameBgm');
-                if (gameBgm) {
+                if (gameBgm && !this.isMuted) {
                     this.tweens.add({
                         targets: gameBgm,
                         volume: 0.02,
@@ -1073,12 +1136,14 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseDraw() {
-        // 引き分け効果音を再生
-        this.sound.play('drawSE', { volume: 0.4 });
+        // 引き分け効果音を再生（ミュート状態を考慮）
+        if (!this.isMuted) {
+            this.sound.play('drawSE', { volume: 0.4 });
+        }
         
-        // BGM音量を即座に戻す
+        // BGM音量を即座に戻す（ミュート時は何もしない）
         const gameBgm = this.sound.get('gameBgm');
-        if (gameBgm) {
+        if (gameBgm && !this.isMuted) {
             this.tweens.add({
                 targets: gameBgm,
                 volume: 0.08,
@@ -1111,9 +1176,9 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(800, () => {
             // 引き分けメッセージをシグナルクリア直前まで表示（2300ms）
             this.showMessage('ひきわけ！もういちど！', 2300, () => {
-                // メッセージが消えるときにBGM音量を下げる
+                // メッセージが消えるときにBGM音量を下げる（ミュート時は何もしない）
                 const gameBgm = this.sound.get('gameBgm');
-                if (gameBgm) {
+                if (gameBgm && !this.isMuted) {
                     this.tweens.add({
                         targets: gameBgm,
                         volume: 0.02,
@@ -1136,12 +1201,14 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseSuccess(reactionFrames) {
-        // 成功効果音を再生
-        this.sound.play('successSE', { volume: 0.5 });
+        // 成功効果音を再生（ミュート状態を考慮）
+        if (!this.isMuted) {
+            this.sound.play('successSE', { volume: 0.5 });
+        }
         
-        // BGM音量を即座に戻す
+        // BGM音量を即座に戻す（ミュート時は何もしない）
         const gameBgm = this.sound.get('gameBgm');
-        if (gameBgm) {
+        if (gameBgm && !this.isMuted) {
             this.tweens.add({
                 targets: gameBgm,
                 volume: 0.08,
@@ -1150,14 +1217,12 @@ class GameScene extends Phaser.Scene {
             });
         }
         
-        // 即座にガードポーズに切り替え（画面揺れと同時）
-        this.gameState.playerState = 'defending';
-        this.updateCharacterSprites();
-        
-        // クリック時の画面揺らしエフェクト
-        this.cameras.main.shake(400, 0.02);
+        console.log(`Defense successful - Stage: ${this.gameState.stage}, Reaction: ${reactionFrames}, Target: ${this.targetFrames}`);
         
         // 成功時の処理
+        this.gameState.isGameActive = false;
+        
+        // 成功時のシグナル表示
         this.signalText.setText('✓')
             .setFill('#00FF00');
         
@@ -1174,55 +1239,55 @@ class GameScene extends Phaser.Scene {
         // シールドエフェクト
         this.showShieldEffect();
         
-        this.time.delayedCall(800, () => {
-            // 敵の状態のみ更新（プレイヤーはガードポーズを維持）
+        // プレイヤーを守備状態に
+        this.gameState.playerState = 'defending';
+        this.gameState.enemyState = 'ko';
+        
+        this.updateCharacterSprites();
+        
+        // 反応時間に基づくメッセージ
+        let successMessage;
+        if (reactionFrames <= this.targetFrames - 5) {
+            successMessage = 'はやい！まもった！';
+        } else if (reactionFrames <= this.targetFrames - 2) {
+            successMessage = 'いいぞ！まもった！';
+        } else {
+            successMessage = 'まもった！';
+        }
+        
+        this.showMessage(successMessage, 1500, () => {
+            // プレイヤー状態をvictoryにして勝利ポーズ
+            this.gameState.playerState = 'victory';
             this.gameState.enemyState = 'ko';
-            this.updateEnemyState(); // 敵のみ更新
             
-            this.time.delayedCall(700, () => {
-                // リアクションタイム評価
-                let reactionMessage = 'まもった！';
-                if (reactionFrames <= 30) { // 0.5秒以内
-                    reactionMessage = 'はやい！まもった！';
-                } else if (reactionFrames <= 60) { // 1秒以内
-                    reactionMessage = 'いいタイミング！まもった！';
-                }
-                
-                this.showMessage(reactionMessage, 1800, () => {
-                    // スコア加算処理
-                    const oldScore = this.gameState.score;
-                    this.gameState.score++;
-                    console.log('Score updated:', oldScore, '->', this.gameState.score); // デバッグ用
-                    this.scoreText.setText(`まもった: ${this.gameState.score}`);
-                    
-                    this.time.delayedCall(600, () => {
-                        // ステージクリア時に勝利ポーズに変更
-                        this.gameState.playerState = 'victory';
-                        this.updateCharacterSprites();
-                        
-                        // 勝利エフェクトを追加（一時的に無効化）
-                        // console.log('Calling showVictoryEffect'); // デバッグ用
-                        // this.showVictoryEffect();
-                        
-                        this.showMessage('ステージクリア！', 1200, () => {
-                            // メッセージ表示後に通常状態に戻してから次ステージへ
-                            this.gameState.playerState = 'normal';
-                            this.updateCharacterSprites();
-                            this.nextStage();
-                        });
+            this.updateCharacterSprites();
+            
+            // 勝利エフェクト
+            this.showVictoryEffect();
+            
+            // 少し待ってから次のステージまたはクリア処理
+            this.time.delayedCall(1500, () => {
+                if (this.gameState.stage >= 7) {
+                    // 全ステージクリア
+                    this.showMessage('ぜんぶ まもりきった！', 2500, () => {
+                        this.nextStage();
                     });
-                });
+                } else {
+                    this.nextStage();
+                }
             });
         });
     }
 
     onDefenseFail(reactionFrames) {
-        // 失敗効果音を再生
-        this.sound.play('failSE', { volume: 0.5 });
+        // 失敗効果音を再生（ミュート状態を考慮）
+        if (!this.isMuted) {
+            this.sound.play('failSE', { volume: 0.5 });
+        }
         
-        // BGM音量を即座に戻す
+        // BGM音量を即座に戻す（ミュート時は何もしない）
         const gameBgm = this.sound.get('gameBgm');
-        if (gameBgm) {
+        if (gameBgm && !this.isMuted) {
             this.tweens.add({
                 targets: gameBgm,
                 volume: 0.08,
@@ -1285,9 +1350,9 @@ class GameScene extends Phaser.Scene {
             
             // メッセージをシグナルクリア直前まで表示（2900ms）
             this.showMessage(failMessage, 2900, () => {
-                // メッセージが消えるときにBGM音量を下げる
+                // メッセージが消えるときにBGM音量を下げる（ミュート時は何もしない）
                 const gameBgm = this.sound.get('gameBgm');
-                if (gameBgm) {
+                if (gameBgm && !this.isMuted) {
                     this.tweens.add({
                         targets: gameBgm,
                         volume: 0.02,
@@ -1319,9 +1384,9 @@ class GameScene extends Phaser.Scene {
             
             // メッセージをゲームオーバー画面表示直前まで表示（1900ms）
             this.showMessage(gameOverMessage, 1900, () => {
-                // メッセージが消えるときにBGM音量を下げる
+                // メッセージが消えるときにBGM音量を下げる（ミュート時は何もしない）
                 const gameBgm = this.sound.get('gameBgm');
-                if (gameBgm) {
+                if (gameBgm && !this.isMuted) {
                     this.tweens.add({
                         targets: gameBgm,
                         volume: 0.02,
