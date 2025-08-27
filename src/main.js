@@ -52,6 +52,9 @@ class PreloadScene extends Phaser.Scene {
         
         // ゲーム背景画像
         this.load.image('gameBackground', 'assets/gen/images/game_background_cyber.png');
+        
+        // タイトルロゴ
+        this.load.image('titleLogo', 'assets/gen/images/title_logo.png');
     }
 
     create() {
@@ -76,29 +79,42 @@ class MenuScene extends Phaser.Scene {
         overlay.fillRect(0, 0, 1920, 1080);
         overlay.setDepth(-50);
 
-        // タイトル背景
-        const titleBg = this.add.graphics();
-        titleBg.fillGradientStyle(0x6B46C1, 0x8B5CF6, 0x6B46C1, 0x8B5CF6, 0.9);
-        titleBg.fillRoundedRect(480, 20, 960, 70, 15);
-        titleBg.setDepth(998);
+        // タイトルロゴ（中央やや下に表示）
+        const titleLogo = this.add.image(960, 450, 'titleLogo').setOrigin(0.5, 0.5).setScale(0.8).setDepth(-40);
         
-        // タイトル
-        this.add.text(960, 55, 'まもれ！ディーフォクシー', {
-            fontSize: '42px',
+        // タイトルロゴの同期アニメーション（上で0度、下で±1度交互）
+        let isPositive = true;
+        const logoAnimation = () => {
+            this.tweens.add({
+                targets: titleLogo,
+                y: 470,
+                angle: isPositive ? 1 : -1,
+                duration: 1000,
+                ease: 'Sine.easeInOut',
+                yoyo: true,
+                onComplete: () => {
+                    isPositive = !isPositive;
+                    logoAnimation();
+                }
+            });
+        };
+        logoAnimation();
+
+        // 制作者クレジット（右下）
+        this.add.text(1850, 1030, 'Created by Kohei Hayakawa', {
+            fontSize: '20px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            fontWeight: 'bold',
-            stroke: '#000000',
-            strokeThickness: 2
-        }).setOrigin(0.5).setDepth(1000).setShadow(3, 3, '#000000', 8);
-
+            alpha: 0.7
+        }).setOrigin(1, 1).setDepth(100);
+        
         // ===== デモエリア =====
         
         // プレイヤー
-        const demoPlayer = this.add.image(450, 750, 'heroNormal').setOrigin(0.5).setScale(0.45).setDepth(100);
+        const demoPlayer = this.add.image(350, 750, 'heroNormal').setOrigin(0.5).setScale(0.45).setDepth(100);
         
         // 警告シグナル
-        const demoSignal = this.add.text(960, 270, '⚠', {
+        const demoSignal = this.add.text(1650, 600, '⚠', {
             fontSize: '120px',
             fill: '#FF0000',
             fontFamily: 'Arial',
@@ -111,7 +127,7 @@ class MenuScene extends Phaser.Scene {
         const demoSignalBg = this.add.graphics().setDepth(999);
         
         // クリック指示
-        const clickPrompt = this.add.text(960, 450, 'マウスでクリック！', {
+        const clickPrompt = this.add.text(1650, 780, 'マウスでクリック！', {
             fontSize: '40px',
             fill: '#FFFF00',
             fontFamily: 'Arial',
@@ -133,7 +149,7 @@ class MenuScene extends Phaser.Scene {
                 demoSignal.setText('⚠').setFill('#FF0000').setVisible(true);
                 demoSignalBg.clear();
                 demoSignalBg.fillStyle(0xFF0000, 0.3);
-                demoSignalBg.fillCircle(960, 270, 120);
+                demoSignalBg.fillCircle(1650, 600, 120);
                 
                 // クリック指示表示
                 clickPrompt.setAlpha(0).setScale(1.8);
@@ -162,10 +178,10 @@ class MenuScene extends Phaser.Scene {
                     demoSignal.setText('✓').setFill('#00FF00');
                     demoSignalBg.clear();
                     demoSignalBg.fillStyle(0x00FF00, 0.3);
-                    demoSignalBg.fillCircle(960, 270, 120);
+                    demoSignalBg.fillCircle(1650, 600, 120);
                     
                     // 成功メッセージ
-                    const successMessage = this.add.text(960, 450, 'すばやくおそう！！', {
+                    const successMessage = this.add.text(1650, 780, 'すばやくおそう！！', {
                         fontSize: '48px',
                         fill: '#00FF00',
                         fontFamily: 'Arial',
@@ -216,13 +232,34 @@ class MenuScene extends Phaser.Scene {
         mainStartBg.lineStyle(4, 0xFFFFFF, 0.5);
         mainStartBg.strokeRoundedRect(560, 780, 800, 80, 15);
         mainStartBg.setDepth(999);
+        
+        // ボタン背景の点滅アニメーション（ロゴと同じ周期）
+        this.tweens.add({
+            targets: mainStartBg,
+            alpha: 0.4,
+            duration: 1000,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1
+        });
 
-        this.add.text(960, 820, '⚡ ゲームスタート！⚡', {
+        const startButtonText = this.add.text(960, 820, 'ゲームスタート！', {
             fontSize: '36px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
             fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(1000).setShadow(3, 3, '#000000', 6);
+        
+        // テキストの点滅アニメーション（ロゴと同じ周期）
+        this.tweens.add({
+            targets: startButtonText,
+            alpha: 0.6,
+            duration: 1000,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1
+        });
+        
 
         // メインボタン操作
         this.add.rectangle(960, 820, 800, 80, 0x000000, 0)
