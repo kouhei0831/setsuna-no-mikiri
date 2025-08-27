@@ -37,6 +37,13 @@ class PreloadScene extends Phaser.Scene {
         
         // BGMの読み込み
         this.load.audio('titleBgm', 'assets/sounds/maou_bgm_cyber31.mp3');
+        this.load.audio('gameBgm', 'assets/sounds/maou_bgm_cyber22.mp3');
+        
+        // 効果音の読み込み
+        this.load.audio('gameStartSE', 'assets/sounds/game_start.mp3');
+        this.load.audio('successSE', 'assets/sounds/success.mp3');
+        this.load.audio('drawSE', 'assets/sounds/drow.mp3');
+        this.load.audio('failSE', 'assets/sounds/fail.mp3');
         
         // プレイヤーキャラクター
         this.load.image('heroNormal', 'assets/gen/images/player_character_normal.png');
@@ -273,6 +280,9 @@ class MenuScene extends Phaser.Scene {
         this.add.rectangle(960, 820, 800, 80, 0x000000, 0)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                // ゲームスタート効果音
+                this.sound.play('gameStartSE', { volume: 0.3 });
+                
                 // BGM停止
                 const titleBgm = this.sound.get('titleBgm');
                 if (titleBgm) {
@@ -356,6 +366,9 @@ class MenuScene extends Phaser.Scene {
             this.add.rectangle(x, buttonY, buttonWidth, buttonHeight, 0x000000, 0)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
+                    // ゲームスタート効果音
+                    this.sound.play('gameStartSE', { volume: 0.3 });
+                    
                     // BGM停止
                     const titleBgm = this.sound.get('titleBgm');
                     if (titleBgm) {
@@ -513,6 +526,11 @@ class GameScene extends Phaser.Scene {
             }
         };
         fadeInStep();
+        
+        // ゲームBGM再生（控えめ音量でループ）
+        if (!this.sound.get('gameBgm')) {
+            this.sound.add('gameBgm', { loop: true, volume: 0.08 }).play();
+        }
 
         this.setupUI();
         this.setupCharacters();
@@ -690,6 +708,17 @@ class GameScene extends Phaser.Scene {
         }
         
         this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
+            // BGM音量を下げて緊張感を演出
+            const gameBgm = this.sound.get('gameBgm');
+            if (gameBgm) {
+                this.tweens.add({
+                    targets: gameBgm,
+                    volume: 0.02,
+                    duration: 500,
+                    ease: 'Power1.easeOut'
+                });
+            }
+            
             // 暗転エフェクトを削除し、直接次の処理に進む
             this.resetCharacterStates();
             this.startDefenseRound();
@@ -925,6 +954,20 @@ class GameScene extends Phaser.Scene {
     }
 
     onEarlyClick() {
+        // 失敗効果音を再生
+        this.sound.play('failSE', { volume: 0.5 });
+        
+        // BGM音量を即座に戻す
+        const gameBgm = this.sound.get('gameBgm');
+        if (gameBgm) {
+            this.tweens.add({
+                targets: gameBgm,
+                volume: 0.08,
+                duration: 200,
+                ease: 'Power2.easeIn'
+            });
+        }
+        
         // クリック時の画面揺らしエフェクト
         this.cameras.main.shake(300, 0.015);
         
@@ -997,6 +1040,20 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseDraw() {
+        // 引き分け効果音を再生
+        this.sound.play('drawSE', { volume: 0.4 });
+        
+        // BGM音量を即座に戻す
+        const gameBgm = this.sound.get('gameBgm');
+        if (gameBgm) {
+            this.tweens.add({
+                targets: gameBgm,
+                volume: 0.08,
+                duration: 200,
+                ease: 'Power2.easeIn'
+            });
+        }
+        
         // 引き分け時の処理
         this.gameState.playerState = 'defending';
         this.updateCharacterSprites();
@@ -1034,6 +1091,20 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseSuccess(reactionFrames) {
+        // 成功効果音を再生
+        this.sound.play('successSE', { volume: 0.5 });
+        
+        // BGM音量を即座に戻す
+        const gameBgm = this.sound.get('gameBgm');
+        if (gameBgm) {
+            this.tweens.add({
+                targets: gameBgm,
+                volume: 0.08,
+                duration: 200,
+                ease: 'Power2.easeIn'
+            });
+        }
+        
         // 即座にガードポーズに切り替え（画面揺れと同時）
         this.gameState.playerState = 'defending';
         this.updateCharacterSprites();
@@ -1101,6 +1172,20 @@ class GameScene extends Phaser.Scene {
     }
 
     onDefenseFail(reactionFrames) {
+        // 失敗効果音を再生
+        this.sound.play('failSE', { volume: 0.5 });
+        
+        // BGM音量を即座に戻す
+        const gameBgm = this.sound.get('gameBgm');
+        if (gameBgm) {
+            this.tweens.add({
+                targets: gameBgm,
+                volume: 0.08,
+                duration: 200,
+                ease: 'Power2.easeIn'
+            });
+        }
+        
         // 失敗時の画面揺らしエフェクト
         this.cameras.main.shake(400, 0.02);
         
