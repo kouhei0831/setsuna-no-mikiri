@@ -677,16 +677,16 @@ class GameScene extends Phaser.Scene {
             strokeThickness: 6
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
-        // フレーム数表示（デジタル時計風、大きなサイズ）
+        // フレーム数表示（デジタル時計風、より大きなサイズ）
         this.frameCounter = 0;
         this.frameCounterText = this.add.text(1845, 990, '', {
-            fontSize: '32px',
+            fontSize: '48px',
             fill: '#00FF00',
             fontFamily: 'Courier',
             backgroundColor: '#000000',
-            padding: { x: 12, y: 8 },
+            padding: { x: 16, y: 12 },
             stroke: '#008800',
-            strokeThickness: 2
+            strokeThickness: 3
         }).setOrigin(1, 1).setVisible(false).setDepth(1000);
     }
 
@@ -1217,8 +1217,12 @@ class GameScene extends Phaser.Scene {
             });
         }
         
-        // 成功時の軽い画面揺らしエフェクト
-        this.cameras.main.shake(150, 0.008);
+        // 即座にガードポーズに切り替え（画面揺れと同時）
+        this.gameState.playerState = 'defending';
+        this.updateCharacterSprites();
+        
+        // クリック時の画面揺らしエフェクト
+        this.cameras.main.shake(400, 0.02);
         
         console.log(`Defense successful - Stage: ${this.gameState.stage}, Reaction: ${reactionFrames}, Target: ${this.targetFrames}`);
         
@@ -1242,52 +1246,44 @@ class GameScene extends Phaser.Scene {
         // シールドエフェクト
         this.showShieldEffect();
         
-        // プレイヤーを守備状態に
-        this.gameState.playerState = 'defending';
-        this.gameState.enemyState = 'ko';
-        
-        this.updateCharacterSprites();
-        
-        // プレイヤーの飛び跳ねアニメーション
-        this.tweens.add({
-            targets: this.player,
-            y: this.player.y - 40,
-            duration: 250,
-            ease: 'Power2.easeOut',
-            yoyo: true,
-            onComplete: () => {
-                // 元の位置に戻った後、少し待って勝利ポーズ
-                this.time.delayedCall(200, () => {
-                    this.gameState.playerState = 'victory';
-                    this.updateCharacterSprites();
-                });
-            }
-        });
-        
-        // 勝利エフェクト（やったー！含む）
-        this.showVictoryEffect();
-        
-        // 反応時間に基づくメッセージ
-        let successMessage;
-        if (reactionFrames <= this.targetFrames - 5) {
-            successMessage = 'はやい！まもった！';
-        } else if (reactionFrames <= this.targetFrames - 2) {
-            successMessage = 'いいぞ！まもった！';
-        } else {
-            successMessage = 'まもった！';
-        }
-        
-        this.showMessage(successMessage, 1500, () => {
-            // 少し待ってから次のステージまたはクリア処理
-            this.time.delayedCall(1000, () => {
-                if (this.gameState.stage >= 7) {
-                    // 全ステージクリア
-                    this.showMessage('ぜんぶ まもりきった！', 2500, () => {
-                        this.nextStage();
-                    });
-                } else {
-                    this.nextStage();
+        this.time.delayedCall(800, () => {
+            // 敵の状態のみ更新（プレイヤーはガードポーズを維持）
+            this.gameState.enemyState = 'ko';
+            this.updateEnemyState(); // 敵のみ更新
+            
+            this.time.delayedCall(700, () => {
+                // リアクションタイム評価
+                let reactionMessage = 'まもった！';
+                if (reactionFrames <= 30) { // 0.5秒以内
+                    reactionMessage = 'はやい！まもった！';
+                } else if (reactionFrames <= 60) { // 1秒以内
+                    reactionMessage = 'いいタイミング！まもった！';
                 }
+                
+                this.showMessage(reactionMessage, 1800, () => {
+                    // スコア加算処理
+                    const oldScore = this.gameState.score;
+                    this.gameState.score++;
+                    console.log('Score updated:', oldScore, '->', this.gameState.score); // デバッグ用
+                    this.scoreText.setText(`まもった: ${this.gameState.score}`);
+                    
+                    this.time.delayedCall(600, () => {
+                        // ステージクリア時に勝利ポーズに変更
+                        this.gameState.playerState = 'victory';
+                        this.updateCharacterSprites();
+                        
+                        // 勝利エフェクトを追加（一時的に無効化）
+                        // console.log('Calling showVictoryEffect'); // デバッグ用
+                        // this.showVictoryEffect();
+                        
+                        this.showMessage('ステージクリア！', 1200, () => {
+                            // メッセージ表示後に通常状態に戻してから次ステージへ
+                            this.gameState.playerState = 'normal';
+                            this.updateCharacterSprites();
+                            this.nextStage();
+                        });
+                    });
+                });
             });
         });
     }
