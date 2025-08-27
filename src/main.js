@@ -328,7 +328,7 @@ class MenuScene extends Phaser.Scene {
         versionBg.fillRoundedRect(10, 10, 80, 30, 5);
         versionBg.setDepth(999);
         
-        this.add.text(50, 25, 'v2.0.0', {
+        this.add.text(50, 25, 'v2.1.0', {
             fontSize: '14px',
             fill: '#00FF00',
             fontFamily: 'Courier',
