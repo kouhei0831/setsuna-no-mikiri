@@ -81,7 +81,7 @@ class MenuScene extends Phaser.Scene {
 
     create() {
         // ミュート状態をlocalStorageから読み込み
-        const isMuted = localStorage.getItem('gameAudioMuted') === 'true';
+        let isMuted = localStorage.getItem('gameAudioMuted') === 'true';
         
         // BGM再生（控えめ音量でループ）- 確実に音量設定と再生
         const existingTitleBgm = this.sound.get('titleBgm');
