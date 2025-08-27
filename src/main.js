@@ -1458,6 +1458,11 @@ class GameScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                // ゲームBGMを停止
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    gameBgm.stop();
+                }
                 this.scene.start('MenuScene');
             })
             .on('pointerover', () => {
@@ -1477,6 +1482,12 @@ class GameScene extends Phaser.Scene {
     }
 
     restartCurrentStage() {
+        // BGM音量を正常に戻す
+        const gameBgm = this.sound.get('gameBgm');
+        if (gameBgm) {
+            gameBgm.setVolume(0.08);
+        }
+        
         // 現在のスコアと難易度を保持してステージを再開
         const currentScore = this.gameState.score;
         const currentDifficulty = this.gameState.difficulty;
@@ -1571,6 +1582,11 @@ class EndingScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                // ゲームBGMを停止
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    gameBgm.stop();
+                }
                 this.scene.start('MenuScene');
             })
             .on('pointerover', () => {
@@ -1611,6 +1627,11 @@ class EndingScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+                // ゲームBGMを停止
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    gameBgm.stop();
+                }
                 this.scene.start('MenuScene');
             })
             .on('pointerover', () => {
