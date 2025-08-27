@@ -1487,15 +1487,15 @@ window.addEventListener('error', (event) => {
 // ゲーム設定
 const gameConfig = {
     type: Phaser.AUTO,
-    width: 1248,  // 1920 * 0.65
-    height: 702,  // 1080 * 0.65
+    width: 1920,
+    height: 1080,
     backgroundColor: '#1a1a2e',
     parent: 'game-container',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        min: { width: 624, height: 351 },  // 960 * 0.65, 540 * 0.65
-        max: { width: 1248, height: 702 }
+        min: { width: 960, height: 540 },
+        max: { width: 1920, height: 1080 }
     },
     physics: {
         default: 'arcade',
@@ -1505,4 +1505,4 @@ const gameConfig = {
         }
     },
     scene: [PreloadScene, MenuScene, GameScene, EndingScene]
-};;
+};
