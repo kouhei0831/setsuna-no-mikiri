@@ -619,7 +619,7 @@ class GameScene extends Phaser.Scene {
         // フレームカウンター更新
         if (this.gameState.isGameActive && this.frameCounterText && this.frameCounterText.visible) {
             this.frameCounter++;
-            const displayFrame = this.frameCounter.toString().padStart(4, '0');
+            const displayFrame = this.frameCounter.toString().padStart(3, '0');
             this.frameCounterText.setText(`${displayFrame}`);
         }
     }
@@ -677,16 +677,16 @@ class GameScene extends Phaser.Scene {
             strokeThickness: 6
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
-        // フレーム数表示（デジタル時計風）
+        // フレーム数表示（デジタル時計風、大きなサイズ）
         this.frameCounter = 0;
         this.frameCounterText = this.add.text(1845, 990, '', {
-            fontSize: '20px',
+            fontSize: '32px',
             fill: '#00FF00',
             fontFamily: 'Courier',
             backgroundColor: '#000000',
-            padding: { x: 8, y: 4 },
+            padding: { x: 12, y: 8 },
             stroke: '#008800',
-            strokeThickness: 1
+            strokeThickness: 2
         }).setOrigin(1, 1).setVisible(false).setDepth(1000);
     }
 
@@ -934,7 +934,7 @@ class GameScene extends Phaser.Scene {
         // フレームカウンター初期化・表示開始
         this.frameCounter = 0;
         this.frameCounterText.setVisible(true);
-        this.frameCounterText.setText('0000');
+        this.frameCounterText.setText('000');
         
         this.gameState.isGameActive = true;
         
@@ -1217,6 +1217,9 @@ class GameScene extends Phaser.Scene {
             });
         }
         
+        // 成功時の軽い画面揺らしエフェクト
+        this.cameras.main.shake(150, 0.008);
+        
         console.log(`Defense successful - Stage: ${this.gameState.stage}, Reaction: ${reactionFrames}, Target: ${this.targetFrames}`);
         
         // 成功時の処理
@@ -1229,7 +1232,7 @@ class GameScene extends Phaser.Scene {
         // 背景を緑に変更
         this.signalGraphics.clear();
         this.signalGraphics.fillStyle(0x00FF00, 0.3);
-        this.signalGraphics.fillCircle(960, 270, 120); // 30px下に移動
+        this.signalGraphics.fillCircle(960, 270, 120);
         
         // 点滅停止
         this.tweens.killTweensOf([this.signalText, this.signalGraphics]);
@@ -1245,6 +1248,25 @@ class GameScene extends Phaser.Scene {
         
         this.updateCharacterSprites();
         
+        // プレイヤーの飛び跳ねアニメーション
+        this.tweens.add({
+            targets: this.player,
+            y: this.player.y - 40,
+            duration: 250,
+            ease: 'Power2.easeOut',
+            yoyo: true,
+            onComplete: () => {
+                // 元の位置に戻った後、少し待って勝利ポーズ
+                this.time.delayedCall(200, () => {
+                    this.gameState.playerState = 'victory';
+                    this.updateCharacterSprites();
+                });
+            }
+        });
+        
+        // 勝利エフェクト（やったー！含む）
+        this.showVictoryEffect();
+        
         // 反応時間に基づくメッセージ
         let successMessage;
         if (reactionFrames <= this.targetFrames - 5) {
@@ -1256,17 +1278,8 @@ class GameScene extends Phaser.Scene {
         }
         
         this.showMessage(successMessage, 1500, () => {
-            // プレイヤー状態をvictoryにして勝利ポーズ
-            this.gameState.playerState = 'victory';
-            this.gameState.enemyState = 'ko';
-            
-            this.updateCharacterSprites();
-            
-            // 勝利エフェクト
-            this.showVictoryEffect();
-            
             // 少し待ってから次のステージまたはクリア処理
-            this.time.delayedCall(1500, () => {
+            this.time.delayedCall(1000, () => {
                 if (this.gameState.stage >= 7) {
                     // 全ステージクリア
                     this.showMessage('ぜんぶ まもりきった！', 2500, () => {
@@ -1319,7 +1332,7 @@ class GameScene extends Phaser.Scene {
         if (reactionFrames !== undefined) {
             // 遅延入力の場合：フレームカウンターを表示継続
             this.frameCounterText.setVisible(true);
-            this.frameCounterText.setText(String(reactionFrames).padStart(4, '0'));
+            this.frameCounterText.setText(String(reactionFrames).padStart(3, '0'));
         } else {
             // 時間切れ失敗の場合：フレームカウンター非表示
             if (this.frameCounterText) {
