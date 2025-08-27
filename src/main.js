@@ -1494,8 +1494,8 @@ const gameConfig = {
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        min: { width: 960, height: 540 },
-        max: { width: 1920, height: 1080 }
+        min: { width: 624, height: 351 },    // 65%サイズ
+        max: { width: 1248, height: 702 }    // 65%サイズ
     },
     physics: {
         default: 'arcade',
