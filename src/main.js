@@ -278,7 +278,25 @@ class MenuScene extends Phaser.Scene {
                 if (titleBgm) {
                     titleBgm.stop();
                 }
-                this.scene.start('GameScene', { difficulty: 'normal' });
+                
+                // 暗転エフェクト
+                const fadeOut = this.add.graphics();
+                fadeOut.setDepth(10000);
+                
+                let fadeAlpha = 0;
+                const fadeStep = () => {
+                    fadeAlpha += 0.05;
+                    fadeOut.clear();
+                    fadeOut.fillStyle(0x000000, fadeAlpha);
+                    fadeOut.fillRect(0, 0, 1920, 1080);
+                    
+                    if (fadeAlpha >= 1) {
+                        this.scene.start('GameScene', { difficulty: 'normal' });
+                    } else {
+                        this.time.delayedCall(16, fadeStep);
+                    }
+                };
+                fadeStep();
             })
             .on('pointerover', () => {
                 mainStartBg.clear();
@@ -338,7 +356,30 @@ class MenuScene extends Phaser.Scene {
             this.add.rectangle(x, buttonY, buttonWidth, buttonHeight, 0x000000, 0)
                 .setInteractive({ useHandCursor: true })
                 .on('pointerdown', () => {
-                    this.scene.start('GameScene', { difficulty: diff.difficulty });
+                    // BGM停止
+                    const titleBgm = this.sound.get('titleBgm');
+                    if (titleBgm) {
+                        titleBgm.stop();
+                    }
+                    
+                    // 暗転エフェクト
+                    const fadeOut = this.add.graphics();
+                    fadeOut.setDepth(10000);
+                    
+                    let fadeAlpha = 0;
+                    const fadeStep = () => {
+                        fadeAlpha += 0.05;
+                        fadeOut.clear();
+                        fadeOut.fillStyle(0x000000, fadeAlpha);
+                        fadeOut.fillRect(0, 0, 1920, 1080);
+                        
+                        if (fadeAlpha >= 1) {
+                            this.scene.start('GameScene', { difficulty: diff.difficulty });
+                        } else {
+                            this.time.delayedCall(16, fadeStep);
+                        }
+                    };
+                    fadeStep();
                 })
                 .on('pointerover', () => {
                     buttonBg.clear();
@@ -453,6 +494,25 @@ class GameScene extends Phaser.Scene {
     create() {
         // ゲーム背景画像（生成されたサイバー背景を適切なサイズで表示）
         this.add.image(960, 540, 'gameBackground').setScale(1.5).setDepth(-100); // 最背面に配置
+        
+        // 明転エフェクト（画面開始時）
+        const fadeIn = this.add.graphics();
+        fadeIn.setDepth(10000);
+        
+        let fadeAlpha = 1;
+        const fadeInStep = () => {
+            fadeAlpha -= 0.05;
+            fadeIn.clear();
+            fadeIn.fillStyle(0x000000, Math.max(0, fadeAlpha));
+            fadeIn.fillRect(0, 0, 1920, 1080);
+            
+            if (fadeAlpha <= 0) {
+                fadeIn.destroy();
+            } else {
+                this.time.delayedCall(16, fadeInStep);
+            }
+        };
+        fadeInStep();
 
         this.setupUI();
         this.setupCharacters();
