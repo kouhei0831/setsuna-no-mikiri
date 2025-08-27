@@ -75,7 +75,7 @@ class MenuScene extends Phaser.Scene {
     create() {
         // BGM再生（控えめ音量でループ）
         if (!this.sound.get('titleBgm')) {
-            this.sound.add('titleBgm', { loop: true, volume: 0.3 }).play();
+            this.sound.add('titleBgm', { loop: true, volume: 0.1 }).play();
         }
         
         // ゲーム背景
