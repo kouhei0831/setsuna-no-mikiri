@@ -957,15 +957,11 @@ class GameScene extends Phaser.Scene {
         // 失敗効果音を再生
         this.sound.play('failSE', { volume: 0.5 });
         
-        // BGM音量を即座に戻す
+        // BGM音量を即座に元に戻す（tweenをkillしてから設定）
         const gameBgm = this.sound.get('gameBgm');
         if (gameBgm) {
-            this.tweens.add({
-                targets: gameBgm,
-                volume: 0.08,
-                duration: 200,
-                ease: 'Power2.easeIn'
-            });
+            this.tweens.killTweensOf(gameBgm);
+            gameBgm.setVolume(0.08);
         }
         
         // クリック時の画面揺らしエフェクト
@@ -1007,7 +1003,7 @@ class GameScene extends Phaser.Scene {
         this.signalText.setAlpha(1);
         this.signalGraphics.setAlpha(1);
         
-        this.showMessage('まだだよ！おちついて！', 1500, () => {
+        this.showMessage('まだだよ！きをつけて！', 1500, () => {
             // シグナルを非表示にしてから直接ライフ処理
             this.signalText.setVisible(false);
             this.signalGraphics.setVisible(false);
@@ -1022,8 +1018,18 @@ class GameScene extends Phaser.Scene {
             this.updateCharacterSprites();
             
             this.showMessage('1かいめのしっぱい！きをつけて！', 1500, () => {
-                // damagedの状態を維持して再スタート（normalに戻さない）
+                // メッセージが消えるときにBGM音量を下げる
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    this.tweens.add({
+                        targets: gameBgm,
+                        volume: 0.02,
+                        duration: 300,
+                        ease: 'Power1.easeOut'
+                    });
+                }
                 
+                // damagedの状態を維持して再スタート（normalに戻さない）
                 this.time.delayedCall(500, () => {
                     this.startDefenseRound();
                 });
@@ -1034,6 +1040,17 @@ class GameScene extends Phaser.Scene {
             this.updateCharacterSprites();
             
             this.showMessage('2かいめのしっぱい！', 1000, () => {
+                // メッセージが消えるときにBGM音量を下げる
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    this.tweens.add({
+                        targets: gameBgm,
+                        volume: 0.02,
+                        duration: 300,
+                        ease: 'Power1.easeOut'
+                    });
+                }
+                
                 this.showGameOverOptions();
             });
         }
@@ -1076,14 +1093,26 @@ class GameScene extends Phaser.Scene {
         this.signalGraphics.setAlpha(1);
         
         this.time.delayedCall(800, () => {
-            // 引き分けメッセージ
-            this.showMessage('ひきわけ！もういちど！', 1200, () => {
+            // 引き分けメッセージをシグナルクリア直前まで表示（2300ms）
+            this.showMessage('ひきわけ！もういちど！', 2300, () => {
+                // メッセージが消えるときにBGM音量を下げる
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    this.tweens.add({
+                        targets: gameBgm,
+                        volume: 0.02,
+                        duration: 300,
+                        ease: 'Power1.easeOut'
+                    });
+                }
+                
                 // プレイヤー状態を通常に戻してから再プレイ
                 this.gameState.playerState = 'normal';
                 this.updateCharacterSprites();
                 
                 // スコアは変更せず、同じステージを再プレイ
-                this.time.delayedCall(600, () => {
+                // 100ms後にstartDefenseRound()でシグナルと同時にクリア
+                this.time.delayedCall(100, () => {
                     this.startDefenseRound();
                 });
             });
@@ -1238,12 +1267,25 @@ class GameScene extends Phaser.Scene {
                 }
             }
             
-            this.showMessage(failMessage, 2000, () => {
+            // メッセージをシグナルクリア直前まで表示（2900ms）
+            this.showMessage(failMessage, 2900, () => {
+                // メッセージが消えるときにBGM音量を下げる
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    this.tweens.add({
+                        targets: gameBgm,
+                        volume: 0.02,
+                        duration: 300,
+                        ease: 'Power1.easeOut'
+                    });
+                }
+                
                 // 2回目のチャンス - damagedの状態を維持
                 this.gameState.enemyState = 'normal';
                 this.updateCharacterSprites();
                 
-                this.time.delayedCall(500, () => {
+                // 100ms後にstartDefenseRound()でシグナルと同時にクリア
+                this.time.delayedCall(100, () => {
                     this.startDefenseRound();
                 });
             });
@@ -1259,8 +1301,27 @@ class GameScene extends Phaser.Scene {
                 gameOverMessage = 'やられた！おそかった！';
             }
             
-            this.showMessage(gameOverMessage, 1500, () => {
-                this.showGameOverOptions();
+            // メッセージをゲームオーバー画面表示直前まで表示（1900ms）
+            this.showMessage(gameOverMessage, 1900, () => {
+                // メッセージが消えるときにBGM音量を下げる
+                const gameBgm = this.sound.get('gameBgm');
+                if (gameBgm) {
+                    this.tweens.add({
+                        targets: gameBgm,
+                        volume: 0.02,
+                        duration: 300,
+                        ease: 'Power1.easeOut'
+                    });
+                }
+                
+                // 100ms後にゲームオーバー画面表示でシグナルクリア
+                this.time.delayedCall(100, () => {
+                    // シグナルクリア
+                    this.signalText.setVisible(false);
+                    this.signalGraphics.setVisible(false);
+                    this.signalGraphics.clear();
+                    this.showGameOverOptions();
+                });
             });
         }
     }
