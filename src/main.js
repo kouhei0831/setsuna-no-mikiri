@@ -1,5 +1,5 @@
 /**
- * 刹那の見切り - DXCのITをまもろう
+ * まもれ！ディーフォクシー - DXCのITをまもろう
  * ファミリーデイ2025向けミニゲーム
  */
 
@@ -83,7 +83,7 @@ class MenuScene extends Phaser.Scene {
         titleBg.setDepth(998);
         
         // タイトル
-        this.add.text(960, 55, '刹那の見切り', {
+        this.add.text(960, 55, 'まもれ！ディーフォクシー', {
             fontSize: '42px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -165,8 +165,8 @@ class MenuScene extends Phaser.Scene {
                     demoSignalBg.fillCircle(960, 270, 120);
                     
                     // 成功メッセージ
-                    const successMessage = this.add.text(960, 450, 'せいこう！！', {
-                        fontSize: '56px',
+                    const successMessage = this.add.text(960, 450, 'すばやくおそう！！', {
+                        fontSize: '48px',
                         fill: '#00FF00',
                         fontFamily: 'Arial',
                         fontWeight: 'bold',
@@ -391,8 +391,9 @@ class GameScene extends Phaser.Scene {
             }
             console.log('Score restored:', this.gameState.score, 'Difficulty:', this.gameState.difficulty); // デバッグ用
         } else {
-            // 新規ゲーム開始時はスコアを0にリセット
+            // 新規ゲーム開始時はスコアとステージを初期化
             this.gameState.score = 0;
+            this.gameState.stage = 1;
         }
         
         // リトライ時はプレイヤー状態をnormalに戻す
@@ -1210,9 +1211,8 @@ class GameScene extends Phaser.Scene {
             this.unifiedTimer = null;
         }
         
-        // 4ステージごとにエンディング画面に遷移
-        if (this.gameState.stage > this.gameState.maxStages && (this.gameState.stage - 1) % 4 === 0) {
-            // 4の倍数ステージクリア時のエンディング
+        // 4ステージクリアでエンディングへ
+        if (this.gameState.stage > 4) {
             this.scene.start('EndingScene', { score: this.gameState.score });
         } else {
             this.signalText.setVisible(false);
