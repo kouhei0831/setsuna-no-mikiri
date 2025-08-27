@@ -80,8 +80,16 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        // BGM再生（控えめ音量でループ）
-        if (!this.sound.get('titleBgm')) {
+        // BGM再生（控えめ音量でループ）- 確実に音量設定と再生
+        const existingTitleBgm = this.sound.get('titleBgm');
+        if (existingTitleBgm) {
+            // 既存のBGMがある場合は音量を設定し直して再生確認
+            existingTitleBgm.setVolume(0.05);
+            if (!existingTitleBgm.isPlaying) {
+                existingTitleBgm.play();
+            }
+        } else {
+            // 新規作成
             this.sound.add('titleBgm', { loop: true, volume: 0.05 }).play();
         }
         
@@ -527,8 +535,16 @@ class GameScene extends Phaser.Scene {
         };
         fadeInStep();
         
-        // ゲームBGM再生（控えめ音量でループ）
-        if (!this.sound.get('gameBgm')) {
+        // ゲームBGM再生（控えめ音量でループ）- 確実に音量設定と再生
+        const existingGameBgm = this.sound.get('gameBgm');
+        if (existingGameBgm) {
+            // 既存のBGMがある場合は音量を設定し直して再生確認
+            existingGameBgm.setVolume(0.08);
+            if (!existingGameBgm.isPlaying) {
+                existingGameBgm.play();
+            }
+        } else {
+            // 新規作成
             this.sound.add('gameBgm', { loop: true, volume: 0.08 }).play();
         }
 
