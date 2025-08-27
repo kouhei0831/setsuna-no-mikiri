@@ -35,6 +35,9 @@ class PreloadScene extends Phaser.Scene {
         this.load.svg('signalSuccess', 'assets/images/signal_success.svg', { width: 120, height: 120 });
         this.load.svg('signalError', 'assets/images/signal_error.svg', { width: 120, height: 120 });
         
+        // BGMの読み込み
+        this.load.audio('titleBgm', 'assets/sounds/maou_bgm_cyber31.mp3');
+        
         // プレイヤーキャラクター
         this.load.image('heroNormal', 'assets/gen/images/player_character_normal.png');
         this.load.image('heroDefending', 'assets/gen/images/player_character_defending.png');
@@ -70,6 +73,11 @@ class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        // BGM再生（控えめ音量でループ）
+        if (!this.sound.get('titleBgm')) {
+            this.sound.add('titleBgm', { loop: true, volume: 0.3 }).play();
+        }
+        
         // ゲーム背景
         this.add.image(960, 540, 'gameBackground').setScale(1.5).setDepth(-100);
 
