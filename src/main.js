@@ -866,7 +866,12 @@ class GameScene extends Phaser.Scene {
             this.difficultyText.setVisible(false);
         }
         
+        // 敵名を表示開始
+        this.enemyNameText.setVisible(true);
+        
         this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
+            // 敵名を非表示にする
+            this.enemyNameText.setVisible(false);
             // BGM音量を下げて緊張感を演出（ミュート時は何もしない）
             const gameBgm = this.sound.get('gameBgm');
             if (gameBgm && !this.isMuted) {
