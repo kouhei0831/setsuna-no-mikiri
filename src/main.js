@@ -785,9 +785,9 @@ class GameScene extends Phaser.Scene {
         }
         
         this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
-            // BGM音量を下げて緊張感を演出
+            // BGM音量を下げて緊張感を演出（ミュート時は何もしない）
             const gameBgm = this.sound.get('gameBgm');
-            if (gameBgm) {
+            if (gameBgm && !this.isMuted) {
                 this.tweens.add({
                     targets: gameBgm,
                     volume: 0.02,
@@ -1636,7 +1636,7 @@ class GameScene extends Phaser.Scene {
         // BGM音量を正常に戻す
         const gameBgm = this.sound.get('gameBgm');
         if (gameBgm) {
-            gameBgm.setVolume(0.08);
+            gameBgm.setVolume(this.isMuted ? 0 : 0.08);
         }
         
         // 現在のスコアと難易度を保持してステージを再開
