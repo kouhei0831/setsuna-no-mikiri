@@ -1139,13 +1139,13 @@ class GameScene extends Phaser.Scene {
             const stageIndex = ((this.gameState.stage - 1) % 4);
             targetFrames = normalFrames[stageIndex];
         } else if (this.gameState.difficulty === 'hard') {
-            // ハード難易度: ステージ5-8の進行パターン
-            const hardFrames = [20, 18, 16, 14];
+            // ハード難易度: ステージ5-8の進行パターン（1フレーム緩和）
+            const hardFrames = [21, 19, 17, 15];
             const stageIndex = ((this.gameState.stage - 1) % 4);
             targetFrames = hardFrames[stageIndex];
         } else if (this.gameState.difficulty === 'extreme') {
-            // エクストリーム難易度: ステージ9-12の進行パターン
-            const extremeFrames = [14, 13, 12, 11];
+            // エクストリーム難易度: ステージ9-12の進行パターン（1フレーム緩和）
+            const extremeFrames = [15, 14, 13, 12];
             const stageIndex = ((this.gameState.stage - 1) % 4);
             targetFrames = extremeFrames[stageIndex];
         } else {
