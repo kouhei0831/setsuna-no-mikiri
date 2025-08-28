@@ -65,6 +65,12 @@ class PreloadScene extends Phaser.Scene {
         
         // タイトルロゴ
         this.load.image('titleLogo', 'assets/gen/images/title_logo.png');
+        
+        // エンディングカード
+        this.load.image('endingCard', 'assets/images/Ending_card.png');
+        
+        // スタンプ
+        this.load.image('stamp', 'assets/images/stamp.png');
     }
 
     create() {
@@ -504,6 +510,46 @@ class MenuScene extends Phaser.Scene {
             fontFamily: 'Courier',
             fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(1000);
+        
+        // ===== デバッグボタン =====
+        
+        // Victory Endingデバッグボタン
+        const debugVictoryBg = this.add.graphics();
+        debugVictoryBg.fillStyle(0x00AA00, 0.8);
+        debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+        debugVictoryBg.setDepth(999);
+        
+        const debugVictoryText = this.add.text(70, 75, 'DEBUG: Victory', {
+            fontSize: '12px',
+            fill: '#FFFFFF',
+            fontFamily: 'Arial',
+            fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(1000);
+        
+        this.add.rectangle(70, 75, 120, 30, 0x000000, 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                const titleBgm = this.sound.get('titleBgm');
+                if (titleBgm) {
+                    titleBgm.stop();
+                }
+                this.scene.start('EndingScene', { 
+                    score: 4,
+                    difficulty: 'extreme'
+                });
+            })
+            .on('pointerover', () => {
+                debugVictoryBg.clear();
+                debugVictoryBg.fillStyle(0x00CC00, 1.0);
+                debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+            })
+            .on('pointerout', () => {
+                debugVictoryBg.clear();
+                debugVictoryBg.fillStyle(0x00AA00, 0.8);
+                debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+            })
+            .setDepth(1001);
+        
     }
 
     showDifficultyHint(text) {
@@ -1559,7 +1605,7 @@ class GameScene extends Phaser.Scene {
         
         // 4ステージクリアでエンディングへ
         if (this.gameState.stage > 4) {
-            this.scene.start('EndingScene', { score: this.gameState.score });
+            this.scene.start('EndingScene', { score: this.gameState.score, difficulty: this.gameState.difficulty });
         } else {
             this.signalText.setVisible(false);
             this.signalGraphics.setVisible(false);
@@ -1649,11 +1695,6 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    showEndMessage() {
-        this.showMessage('あそんでくれてありがとう！', 2000, () => {
-            this.scene.start('EndingScene', { score: this.gameState.score, isGameOver: true });
-        });
-    }
 
     showMessage(text, duration, callback) {
         this.messageText.setText(text);
@@ -1692,93 +1733,105 @@ class EndingScene extends Phaser.Scene {
 
     init(data) {
         this.finalScore = data.score || 0;
-        this.isGameOver = data.isGameOver || false;
+        this.currentDifficulty = data.difficulty || 'normal';
     }
 
     create() {
-        // 背景
-        this.add.rectangle(960, 540, 1920, 1080, 0x6B46C1);
+        // 背景色
+        this.add.rectangle(960, 540, 1920, 1080, 0x1a1a2e);
+        
+        // エンディングカードを左側に配置（画面内に収める）
+        this.add.image(420, 540, 'endingCard')
+            .setOrigin(0.5)
+            .setScale(0.4)
+            .setRotation(-0.05); // 軽い傾き
+        
+        // スタンプを右側に配置（適度な大きさ）
+        this.add.image(1380, 540, 'stamp')
+            .setOrigin(0.5)
+            .setScale(1.8)
+            .setRotation(0.1); // 軽い傾き
+        
+        // タイトルロゴを左下に配置
+        this.add.image(280, 920, 'titleLogo')
+            .setOrigin(0.5)
+            .setScale(0.4)
+            .setRotation(-0.03); // 極軽い傾き
 
-        if (this.isGameOver) {
-            this.showGameOverEnding();
-        } else {
-            this.showVictoryEnding();
-        }
-
-        // DXCブランディングを最初から表示
-        this.showDXCBranding();
+        this.showVictoryEnding();
     }
 
     showVictoryEnding() {
-        this.add.text(960, 240, 'ぜんぶクリア！', {
-            fontSize: '48px',
-            fill: '#F59E0B',
-            fontFamily: 'Arial',
-            fontWeight: 'bold',
-            backgroundColor: '#000000',
-            padding: { x: 20, y: 10 }
-        }).setOrigin(0.5);
-
-        this.add.text(960, 360, 'DXCのIT（アイティー）をまもってくれて\nありがとう！', {
-            fontSize: '24px',
+        // メインメッセージ（左上）
+        this.add.text(450, 140, 'あそんでくれてありがとう！', {
+            fontSize: '64px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            align: 'center',
-            backgroundColor: '#2d1b69',
-            padding: { x: 15, y: 8 }
+            fontWeight: 'bold',
+            stroke: '#000000',
+            strokeThickness: 8,
+            shadow: {
+                offsetX: 5,
+                offsetY: 5,
+                color: '#000000',
+                blur: 10,
+                stroke: true,
+                fill: true
+            }
         }).setOrigin(0.5);
 
-        // スタートボタンと同じ見た目のタイトルへボタン（SVG使用）
-        const titleButton = this.add.image(960, 510, 'textlessButton')
+        // スタンプメッセージ（左上）
+        this.add.text(450, 240, 'スタンプをおしてね！', {
+            fontSize: '40px',
+            fill: '#FFD700',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            stroke: '#000000',
+            strokeThickness: 6,
+            shadow: {
+                offsetX: 4,
+                offsetY: 4,
+                color: '#000000',
+                blur: 8,
+                stroke: true,
+                fill: true
+            }
+        }).setOrigin(0.5);
+
+        // ボタン配置（下の方）
+        const challengeButton = this.add.image(760, 850, 'textlessButton')
             .setOrigin(0.5)
+            .setScale(1.4)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                // ゲームBGMを停止
                 const gameBgm = this.sound.get('gameBgm');
                 if (gameBgm) {
                     gameBgm.stop();
                 }
-                this.scene.start('MenuScene');
+                const nextDifficulty = this.getNextDifficulty();
+                this.scene.start('GameScene', { difficulty: nextDifficulty });
             })
             .on('pointerover', () => {
-                titleButton.setScale(1.1);
+                challengeButton.setScale(1.5);
             })
             .on('pointerout', () => {
-                titleButton.setScale(1.0);
+                challengeButton.setScale(1.4);
             });
 
-        // ボタンの上にテキストを重ねて表示
-        this.add.text(960, 510, 'タイトルへ', {
-            fontSize: '20px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            fontWeight: 'bold'
-        }).setOrigin(0.5);
-    }
-
-    showGameOverEnding() {
-        this.add.text(960, 300, 'ゲームしゅうりょう', {
+        this.add.text(760, 850, 'チャレンジ！', {
             fontSize: '36px',
             fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            backgroundColor: '#2d1b69',
-            padding: { x: 18, y: 9 }
+            fontFamily: 'Arial Black',
+            fontWeight: 'bold',
+            stroke: '#000000',
+            strokeThickness: 3
         }).setOrigin(0.5);
 
-        this.add.text(960, 420, 'つぎはがんばろう！', {
-            fontSize: '20px',
-            fill: '#F59E0B',
-            fontFamily: 'Arial',
-            backgroundColor: '#000000',
-            padding: { x: 12, y: 6 }
-        }).setOrigin(0.5);
-
-        // スタートボタンと同じ見た目のタイトルへボタン（SVG使用）
-        const titleButton = this.add.image(960, 520, 'textlessButton')
+        const titleButton = this.add.image(1160, 850, 'textlessButton')
             .setOrigin(0.5)
+            .setScale(1.4)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                // ゲームBGMを停止
                 const gameBgm = this.sound.get('gameBgm');
                 if (gameBgm) {
                     gameBgm.stop();
@@ -1786,50 +1839,67 @@ class EndingScene extends Phaser.Scene {
                 this.scene.start('MenuScene');
             })
             .on('pointerover', () => {
-                titleButton.setScale(1.1);
+                titleButton.setScale(1.5);
             })
             .on('pointerout', () => {
-                titleButton.setScale(1.0);
+                titleButton.setScale(1.4);
             });
 
-        // ボタンの上にテキストを重ねて表示
-        this.add.text(960, 520, 'タイトルへ', {
-            fontSize: '20px',
+        this.add.text(1160, 850, 'おわり', {
+            fontSize: '36px',
             fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            fontWeight: 'bold'
+            fontFamily: 'Arial Black',
+            fontWeight: 'bold',
+            stroke: '#000000',
+            strokeThickness: 3
         }).setOrigin(0.5);
+
+        // 祝福アニメーション
+        this.time.addEvent({
+            delay: 500,
+            loop: true,
+            callback: () => {
+                this.createCelebrationParticle();
+            }
+        });
     }
 
-    showDXCBranding() {
-        this.add.text(960, 675, 'DXC Technology', {
-            fontSize: '32px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            fontWeight: 'bold',
-            backgroundColor: '#2d1b69',
-            padding: { x: 16, y: 8 }
-        }).setOrigin(0.5);
 
-        this.add.text(960, 765, 'ファミリーデイにさんかしてくれて\nありがとうございます', {
-            fontSize: '18px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            align: 'center',
-            backgroundColor: '#000000',
-            padding: { x: 12, y: 6 }
-        }).setOrigin(0.5);
+    getNextDifficulty() {
+        if (this.currentDifficulty === 'normal') {
+            return 'hard';
+        } else if (this.currentDifficulty === 'hard') {
+            return 'extreme';
+        } else {
+            return 'extreme'; // エクストリームはそのまま
+        }
+    }
 
-        this.add.text(960, 915, 'また来年のファミリーデイで\nおあいしましょう！', {
-            fontSize: '16px',
-            fill: '#F59E0B',
-            fontFamily: 'Arial',
-            align: 'center',
-            backgroundColor: '#2d1b69',
-            padding: { x: 10, y: 5 }
-        }).setOrigin(0.5);
+    createCelebrationParticle() {
+        const colors = [0xFFD700, 0xFF69B4, 0x00CED1, 0xFFA500, 0x32CD32];
+        const x = Phaser.Math.Between(100, 1820);
+        const particle = this.add.circle(x, -20, 8, Phaser.Math.RND.pick(colors));
+        
+        this.tweens.add({
+            targets: particle,
+            y: 1100,
+            x: x + Phaser.Math.Between(-100, 100),
+            duration: Phaser.Math.Between(3000, 5000),
+            ease: 'Sine.easeIn',
+            onComplete: () => {
+                particle.destroy();
+            }
+        });
 
-        // 自動でタイトルに戻る機能を削除（ボタンでのみ戻る）
+        this.tweens.add({
+            targets: particle,
+            scaleX: Phaser.Math.FloatBetween(0.5, 1.5),
+            scaleY: Phaser.Math.FloatBetween(0.5, 1.5),
+            duration: Phaser.Math.Between(500, 1500),
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1
+        });
     }
 }
 
