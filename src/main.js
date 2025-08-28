@@ -52,8 +52,11 @@ class PreloadScene extends Phaser.Scene {
         this.load.image('heroVictory', 'assets/gen/images/player_character_victory.png');
         this.load.image('heroKo', 'assets/gen/images/player_character_normal.png');
         
-        this.load.svg('malwareNormal', 'assets/images/threat_malware_normal.svg', { width: 48, height: 48 });
-        this.load.svg('systemErrorNormal', 'assets/images/threat_system_error_normal.svg', { width: 48, height: 48 });
+        // 敵キャラクター画像
+        this.load.image('pcEnemy', 'assets/gen/images/PC_enemy.png');
+        this.load.image('serverEnemy', 'assets/gen/images/server_enemy.png');
+        this.load.image('netEnemy', 'assets/gen/images/net_enemy.png');
+        this.load.image('cloudEnemy', 'assets/gen/images/cloud_enemy.png');
         
         this.load.svg('startButton', 'assets/images/start_button.svg', { width: 200, height: 60 });
         this.load.svg('textlessButton', 'assets/images/textless_button.svg', { width: 200, height: 60 });
@@ -700,6 +703,16 @@ class GameScene extends Phaser.Scene {
             padding: { x: 8, y: 4 }
         }).setOrigin(0, 1).setVisible(false).setDepth(1000);
 
+        // 敵名表示（敵の上に表示）
+        this.enemyNameText = this.add.text(1545, 680, '', {
+            fontSize: '24px',
+            fill: '#FFFFFF',
+            fontFamily: 'Arial',
+            fontWeight: 'bold',
+            backgroundColor: '#FF0000',
+            padding: { x: 12, y: 6 }
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
+
         // メッセージ表示エリア
         this.messageText = this.add.text(960, 900, '', {
             fontSize: '24px',
@@ -745,18 +758,41 @@ class GameScene extends Phaser.Scene {
     }
 
     updateStageAssets() {
-        // 敵の種類をステージに応じて変更（1-2のサイクルで統一）
-        const threats = ['malwareNormal', 'systemErrorNormal'];
+        // 敵の種類をステージに応じて変更（1-4のサイクルで統一）
+        const threats = ['pcEnemy', 'serverEnemy', 'netEnemy', 'cloudEnemy'];
+        const enemyNames = ['フロッピーディスク', 'ヒューマンエラー', 'マルウェア', 'しぜんさいがい'];
         
-        // 全ステージで1-2のサイクルを使用
-        const cycleIndex = (this.gameState.stage - 1) % 2;
-        const currentThreat = threats[cycleIndex] || 'malwareNormal';
+        // 全ステージで1-4のサイクルを使用
+        const cycleIndex = (this.gameState.stage - 1) % 4;
+        const currentThreat = threats[cycleIndex] || 'pcEnemy';
+        const currentEnemyName = enemyNames[cycleIndex] || 'フロッピーディスク';
 
         // 既存のスプライトを削除して新しいものを作成
         if (this.enemy) this.enemy.destroy();
 
-        // 敵キャラクター
-        this.enemy = this.add.image(1545, 540, currentThreat).setOrigin(0.5).setDepth(100);
+        // 敵キャラクター（主人公と同じ高さに配置）
+        this.enemy = this.add.image(1545, 750, currentThreat).setOrigin(0.5).setDepth(100);
+        
+        // 敵の初期状態をリセット（アニメーション後の状態をクリア）
+        this.enemy.setRotation(0);
+        this.enemy.setAlpha(1);
+        
+        // 敵のサイズ調整
+        if (currentThreat === 'pcEnemy') {
+            this.enemy.setScale(0.3);
+        } else if (currentThreat === 'serverEnemy') {
+            this.enemy.setScale(0.3); // サーバー敵も同じサイズ
+        } else if (currentThreat === 'netEnemy') {
+            this.enemy.setScale(0.3); // ネット敵も同じサイズ
+        } else if (currentThreat === 'cloudEnemy') {
+            this.enemy.setScale(0.3); // クラウド敵も同じサイズ
+        } else {
+            this.enemy.setScale(1.0); // 他の敵は通常サイズ
+        }
+        
+        // 敵名を設定してテキストを更新
+        this.currentEnemyName = currentEnemyName;
+        this.enemyNameText.setText(this.currentEnemyName);
     }
 
     updateEnemyState() {
@@ -1292,10 +1328,40 @@ class GameScene extends Phaser.Scene {
         // シールドエフェクト
         this.showShieldEffect();
         
+        // 敵の状態のみ更新（プレイヤーはガードポーズを維持）
+        this.gameState.enemyState = 'ko';
+        
+        // 敵の吹っ飛ばしアニメーション（ぐるぐる回りながら右上に消える）- 成功した瞬間に開始
+        if (this.enemy) {
+            // 回転アニメーション（高速）
+            this.tweens.add({
+                targets: this.enemy,
+                rotation: Math.PI * 8, // 4回転に増加
+                duration: 600, // 半分の時間
+                ease: 'Power3.easeOut'
+            });
+            
+            // 移動アニメーション（右上に飛ぶ、より遠くへ）
+            this.tweens.add({
+                targets: this.enemy,
+                x: this.enemy.x + 600, // より遠くに飛ぶ
+                y: this.enemy.y - 400, // より高く飛ぶ
+                duration: 600, // 半分の時間
+                ease: 'Power3.easeOut'
+            });
+            
+            // サイズと透明度アニメーション（小さくなりながら消える）
+            this.tweens.add({
+                targets: this.enemy,
+                scaleX: 0.05,
+                scaleY: 0.05,
+                alpha: 0,
+                duration: 600, // 半分の時間
+                ease: 'Power3.easeOut'
+            });
+        }
+        
         this.time.delayedCall(800, () => {
-            // 敵の状態のみ更新（プレイヤーはガードポーズを維持）
-            this.gameState.enemyState = 'ko';
-            this.updateEnemyState(); // 敵のみ更新
             
             this.time.delayedCall(700, () => {
                 // リアクションタイム評価
