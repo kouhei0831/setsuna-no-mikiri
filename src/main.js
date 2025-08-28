@@ -705,10 +705,19 @@ class GameScene extends Phaser.Scene {
 
         // 敵名表示（敵の上に表示）
         this.enemyNameText = this.add.text(1545, 580, '', {
-            fontSize: '32px',
-            fill: '#FF0000',
+            fontSize: '40px',
+            fill: '#FFFFFF',
             fontFamily: 'Courier New, monospace',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            stroke: '#FF0000',
+            strokeThickness: 4,
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                color: '#000000',
+                blur: 3,
+                fill: true
+            }
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // メッセージ表示エリア
