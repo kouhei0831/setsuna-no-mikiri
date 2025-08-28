@@ -919,6 +919,28 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', () => {
             this.onDefenseInput();
         });
+
+        // ESCキーでタイトルに強制復帰
+        this.input.keyboard.on('keydown-ESC', () => {
+            this.forceReturnToTitle();
+        });
+    }
+
+    forceReturnToTitle() {
+        console.log('ESC key pressed - returning to title');
+        
+        // 現在のBGMを停止
+        const gameBgm = this.sound.get('gameBgm');
+        if (gameBgm) {
+            gameBgm.stop();
+        }
+        
+        // 全てのアニメーション・タイマーを停止
+        this.tweens.killAll();
+        this.time.removeAllEvents();
+        
+        // タイトル画面に遷移
+        this.scene.start('MenuScene');
     }
 
     startStage() {
@@ -1935,6 +1957,11 @@ class EndingScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setScale(0.4)
             .setRotation(-0.03); // 極軽い傾き
+
+        // ESCキーでタイトルに強制復帰
+        this.input.keyboard.on('keydown-ESC', () => {
+            this.scene.start('MenuScene');
+        });
 
         this.showVictoryEnding();
     }
