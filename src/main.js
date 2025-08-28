@@ -920,6 +920,10 @@ class GameScene extends Phaser.Scene {
             this.onDefenseInput();
         });
 
+        this.input.keyboard.on('keydown-ENTER', () => {
+            this.onDefenseInput();
+        });
+
         // ESCキーでタイトルに強制復帰
         this.input.keyboard.on('keydown-ESC', () => {
             this.forceReturnToTitle();
