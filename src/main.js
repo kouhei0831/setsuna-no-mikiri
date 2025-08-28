@@ -704,13 +704,11 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0, 1).setVisible(false).setDepth(1000);
 
         // 敵名表示（敵の上に表示）
-        this.enemyNameText = this.add.text(1545, 680, '', {
-            fontSize: '24px',
-            fill: '#FFFFFF',
-            fontFamily: 'Arial',
-            fontWeight: 'bold',
-            backgroundColor: '#FF0000',
-            padding: { x: 12, y: 6 }
+        this.enemyNameText = this.add.text(1545, 580, '', {
+            fontSize: '32px',
+            fill: '#FF0000',
+            fontFamily: 'Courier New, monospace',
+            fontWeight: 'bold'
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // メッセージ表示エリア
@@ -869,7 +867,7 @@ class GameScene extends Phaser.Scene {
         // 敵名を表示開始
         this.enemyNameText.setVisible(true);
         
-        this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 2000, () => {
+        this.showMessage(`レベル ${this.gameState.stage}: ${stageName}をまもろう`, 3000, () => {
             // 敵名を非表示にする
             this.enemyNameText.setVisible(false);
             // BGM音量を下げて緊張感を演出（ミュート時は何もしない）
