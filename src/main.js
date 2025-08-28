@@ -1249,7 +1249,7 @@ class GameScene extends Phaser.Scene {
     onDefenseSuccess(reactionFrames) {
         // 成功効果音を再生（ミュート状態を考慮）
         if (!this.isMuted) {
-            this.sound.play('successSE', { volume: 0.5 });
+            this.sound.play('successSE', { volume: 0.3 });
         }
         
         // BGM音量を即座に戻す（ミュート時は何もしない）
@@ -1762,8 +1762,8 @@ class EndingScene extends Phaser.Scene {
     }
 
     showVictoryEnding() {
-        // メインメッセージ（左上）
-        this.add.text(450, 140, 'あそんでくれてありがとう！', {
+        // メインメッセージ（左上）- フェードイン + 拡大
+        const mainMessage = this.add.text(450, 140, 'あそんでくれてありがとう！', {
             fontSize: '64px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
@@ -1778,10 +1778,19 @@ class EndingScene extends Phaser.Scene {
                 stroke: true,
                 fill: true
             }
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setAlpha(0).setScale(0.8);
 
-        // スタンプメッセージ（左上）
-        this.add.text(450, 240, 'スタンプをおしてね！', {
+        // メインメッセージのアニメーション
+        this.tweens.add({
+            targets: mainMessage,
+            alpha: 1,
+            scale: 1.0,
+            duration: 800,
+            ease: 'Back.easeOut'
+        });
+
+        // スタンプメッセージ（左上）- 遅れてフェードイン + バウンス
+        const stampMessage = this.add.text(450, 240, 'スタンプをおしてね！', {
             fontSize: '40px',
             fill: '#FFD700',
             fontFamily: 'Arial',
@@ -1796,7 +1805,28 @@ class EndingScene extends Phaser.Scene {
                 stroke: true,
                 fill: true
             }
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setAlpha(0).setScale(0.5);
+
+        // スタンプメッセージのアニメーション（遅延）
+        this.tweens.add({
+            targets: stampMessage,
+            alpha: 1,
+            scale: 1.0,
+            duration: 600,
+            delay: 400,
+            ease: 'Back.easeOut'
+        });
+
+        // スタンプメッセージの点滅効果
+        this.tweens.add({
+            targets: stampMessage,
+            scale: 1.1,
+            duration: 1000,
+            delay: 1200,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1
+        });
 
         // ボタン配置（下の方）
         const challengeButton = this.add.image(760, 850, 'textlessButton')
