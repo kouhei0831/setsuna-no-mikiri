@@ -529,27 +529,78 @@ class MenuScene extends Phaser.Scene {
             fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(1000);
         
+        // デバッグボタンの長押し機能
+        let debugHoldTimer = null;
+        let debugHoldProgress = 0;
+        
         this.add.rectangle(70, 75, 120, 30, 0x000000, 0)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                const titleBgm = this.sound.get('titleBgm');
-                if (titleBgm) {
-                    titleBgm.stop();
-                }
-                this.scene.start('EndingScene', { 
-                    score: 4,
-                    difficulty: 'extreme'
+                // 長押し開始（3秒間）
+                debugHoldProgress = 0;
+                debugHoldTimer = this.time.addEvent({
+                    delay: 50,
+                    repeat: 59, // 3秒 = 3000ms / 50ms = 60回
+                    callback: () => {
+                        debugHoldProgress += (1/60);
+                        // プログレス表示（緑→黄→赤に変化）
+                        let color = debugHoldProgress < 0.5 ? 
+                            Phaser.Display.Color.Interpolate.ColorWithColor(
+                                {r: 0, g: 170, b: 0}, {r: 255, g: 255, b: 0}, 60, debugHoldProgress * 120
+                            ) :
+                            Phaser.Display.Color.Interpolate.ColorWithColor(
+                                {r: 255, g: 255, b: 0}, {r: 255, g: 0, b: 0}, 60, (debugHoldProgress - 0.5) * 120
+                            );
+                        debugVictoryBg.clear();
+                        debugVictoryBg.fillStyle(Phaser.Display.Color.GetColor(color.r, color.g, color.b), 0.8 + debugHoldProgress * 0.2);
+                        debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+                    },
+                    callbackScope: this
+                });
+                
+                // 3秒後に実行
+                this.time.delayedCall(3000, () => {
+                    if (debugHoldTimer && debugHoldTimer.getProgress() >= 1) {
+                        const titleBgm = this.sound.get('titleBgm');
+                        if (titleBgm) {
+                            titleBgm.stop();
+                        }
+                        this.scene.start('EndingScene', { 
+                            score: 4,
+                            difficulty: 'extreme'
+                        });
+                    }
                 });
             })
-            .on('pointerover', () => {
-                debugVictoryBg.clear();
-                debugVictoryBg.fillStyle(0x00CC00, 1.0);
-                debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
-            })
-            .on('pointerout', () => {
+            .on('pointerup', () => {
+                // 長押しキャンセル
+                if (debugHoldTimer) {
+                    debugHoldTimer.remove();
+                    debugHoldTimer = null;
+                }
+                debugHoldProgress = 0;
+                // 元の色に戻す
                 debugVictoryBg.clear();
                 debugVictoryBg.fillStyle(0x00AA00, 0.8);
                 debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+            })
+            .on('pointerout', () => {
+                // マウスが離れた場合もキャンセル
+                if (debugHoldTimer) {
+                    debugHoldTimer.remove();
+                    debugHoldTimer = null;
+                }
+                debugHoldProgress = 0;
+                debugVictoryBg.clear();
+                debugVictoryBg.fillStyle(0x00AA00, 0.8);
+                debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+            })
+            .on('pointerover', () => {
+                if (!debugHoldTimer) {
+                    debugVictoryBg.clear();
+                    debugVictoryBg.fillStyle(0x00CC00, 1.0);
+                    debugVictoryBg.fillRoundedRect(10, 60, 120, 30, 5);
+                }
             })
             .setDepth(1001);
         
@@ -674,14 +725,25 @@ class GameScene extends Phaser.Scene {
     }
 
     setupUI() {
-        // ステージ表示
+        // ステージ表示のスタイリッシュ版
+        // 背景グラフィック
+        this.stageBg = this.add.graphics();
+        this.stageBg.setDepth(999);
+        
+        // メインテキスト（シンプル化）
         this.stageText = this.add.text(960, 75, '', {
-            fontSize: '28px',
+            fontSize: '32px',
             fill: '#FFFFFF',
             fontFamily: 'Arial',
-            fontWeight: 'bold',
-            backgroundColor: '#000000',
-            padding: { x: 15, y: 8 }
+            fontWeight: 'bold'
+        }).setOrigin(0.5).setVisible(false).setDepth(1000);
+
+        // サブテキスト（ステージ番号）
+        this.stageNumberText = this.add.text(960, 50, '', {
+            fontSize: '16px',
+            fill: '#E5E7EB',
+            fontFamily: 'Arial',
+            fontWeight: 'normal'
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // スコア表示
@@ -721,8 +783,8 @@ class GameScene extends Phaser.Scene {
         }).setOrigin(0.5).setVisible(false).setDepth(1000);
 
         // メッセージ表示エリア
-        this.messageText = this.add.text(960, 900, '', {
-            fontSize: '24px',
+        this.messageText = this.add.text(960, 950, '', {
+            fontSize: '40px',
             fill: '#F59E0B',
             fontFamily: 'Arial',
             fontWeight: 'bold',
@@ -754,6 +816,41 @@ class GameScene extends Phaser.Scene {
             stroke: '#008800',
             strokeThickness: 3
         }).setOrigin(1, 1).setVisible(false).setDepth(1000);
+    }
+
+    updateStageDisplay(stageNum, stageName) {
+        // シンプルな背景を描画
+        this.stageBg.clear();
+        
+        // フラットな背景（完全に中央配置）
+        this.stageBg.fillStyle(0x6B46C1, 0.9);
+        this.stageBg.fillRoundedRect(620, 40, 680, 70, 12);
+        
+        // シンプルなボーダー
+        this.stageBg.lineStyle(2, 0x8B5CF6, 1);
+        this.stageBg.strokeRoundedRect(620, 40, 680, 70, 12);
+        
+        this.stageBg.setVisible(true);
+        
+        // ステージ番号のサブテキスト更新
+        this.stageNumberText.setText(`STAGE ${stageNum.toString().padStart(2, '0')}`);
+        this.stageNumberText.setVisible(true);
+        
+        // メインテキスト更新
+        this.stageText.setText(`${stageName}をまもろう`);
+        this.stageText.setVisible(true);
+        
+        // エントリーアニメーション
+        this.stageBg.setAlpha(0);
+        this.stageNumberText.setAlpha(0);
+        this.stageText.setAlpha(0);
+        
+        this.tweens.add({
+            targets: [this.stageBg, this.stageNumberText, this.stageText],
+            alpha: 1,
+            duration: 600,
+            ease: 'Power2.easeOut'
+        });
     }
 
     setupCharacters() {
@@ -826,7 +923,7 @@ class GameScene extends Phaser.Scene {
 
     startStage() {
         if (this.gameState.stage === 1) {
-            this.showMessage('DXCのIT(アイティー)をまもろう！\nタップでぼうぎょ！', 2000, () => {
+            this.showMessage('DXCのIT(アイティー)をまもろう！\nシグナルがでたらすばやくクリック！', 2000, () => {
                 this.showStageInfo();
             });
         } else {
@@ -858,9 +955,8 @@ class GameScene extends Phaser.Scene {
             difficultyColor = '#FF0000';
         }
         
-        // ステージ名表示
-        this.stageText.setText(`レベル ${this.gameState.stage}: ${stageName}をまもろう`);
-        this.stageText.setVisible(true);
+        // ステージ名表示（スタイリッシュ版）
+        this.updateStageDisplay(this.gameState.stage, stageName);
         
         // 難易度表示更新
         this.difficultyText.setText(difficultyLabel);
@@ -1691,7 +1787,11 @@ class GameScene extends Phaser.Scene {
             this.messageText.setText('');
             this.messageText.setVisible(false);
             this.stageText.setVisible(false);
+            this.stageNumberText.setVisible(false);
+            this.stageBg.setVisible(false);
             this.difficultyText.setVisible(false);
+            // ステージ表示のアニメーションをクリア
+            this.tweens.killTweensOf([this.stageText, this.stageNumberText, this.stageBg]);
             this.updateStageAssets(); // 新しいステージのアセットを設定
             this.startStage();
         }
